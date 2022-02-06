@@ -39,6 +39,8 @@ local defaults = {
 }
 
 function ZUI_LickAndTickle:OnInitialize()
+    LAT_GUI.backdropTable = {}
+    LAT_GUI.plateTable = {}
     self.db = LibStub("AceDB-3.0"):New("ZUI_LickAndTickleDB", defaults, true)
     icon:Register("ZUI_LickAndTickle", ZUI_LDB, self.db.profile.minimap)
     LAT_GUI.LickAndTickle = CreateFrame("Frame", "lickAndTickle", UIParent)
@@ -51,32 +53,55 @@ function ZUI_LickAndTickle:OnInitialize()
     LAT_GUI.LickAndTickle:SetScript("OnEvent", function(self, event, ...)
         if (event == "NAME_PLATE_UNIT_ADDED") then
             local nameplateid = ...
-            local nameplateUnitGuid = UnitGUID(nameplateid)
             local unitname = UnitName(nameplateid)
+            local namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).UnitFrame
             local inLickDB = false
+            local inTickleDB = false
+            local inAnyDB = true
             for i, item in ipairs(ZUI_LickAndTickle.db.profile.licked) do
                 if (item == unitname) then inLickDB = true end
             end
-            if (inLickDB == false) then 
-                ZUI_LickAndTickle:CreateNamePlateUI()
-                
-            end 
-            local inTickleDB = false
             for i, item in ipairs(ZUI_LickAndTickle.db.profile.tickled) do
                 if (item == unitname) then inTickleDB = true end
             end
-            if (inTickleDB == false) then 
-                ZUI_LickAndTickle:CreateNamePlateUI() 
-                
-            end 
-            local namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).UnitFrame
-            LAT_GUI.namePlate = namePlate
-            LAT_GUI.namePlate.newFrame = CreateFrame("Button")
-            LAT_GUI.namePlate:Hide()
-            if (LAT_GUI.namePlate) then print("yes") end
-        end
-    end)
+            if (inLickDB == false and inTickleDB == false) then
+                inAnyDB = false
+            else
+                inAnyDB = true
+            end
 
+            print("inAnyDB = ", inAnyDB, "\t inLickDB = ", inLickDB, "\t inTickleDB = ", inTickleDB)
+            
+            if (inAnyDB == false) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\RedBall.blp", namePlate) end
+            if (inAnyDB == true and inLickDB == false) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\BlueBall.blp", namePlate) end
+            if (inAnyDB == true and inTickleDB == false) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate) end
+                    
+            --local nameplateUnitGuid = UnitGUID(nameplateid)
+            
+            --LAT_GUI.namePlate.name:Hide()
+            -- for i, k in pairs(LAT_GUI.namePlate) do
+            --     print(i, "---", k)
+            -- end
+
+            -- local itemframe = CreateFrame("Frame", nil, LAT_GUI.namePlate, "BackdropTemplate")
+            -- itemframe:SetFrameStrata("HIGH")
+            -- itemframe:SetFrameLevel(0)
+            -- itemframe:SetSize(64, 20)
+            -- itemframe:SetPoint("CENTER", 0, 0)
+            -- itemframe:SetBackdropColor(0, 0, 1, .5)
+
+            --local btn = ZUI_LickAndTickle:CreateBtns(nil, itemframe, "LICK ME!!", "lick")
+
+            -- local itemtext = itemframe:CreateFontString("text", "HIGH")
+            -- itemtext:SetPoint("CENTER")
+            -- itemtext:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
+            -- itemtext:SetText("HELLO WORLD!!!")  
+
+            -- LAT_GUI.namePlate.name:SetText("BoB")
+        end
+
+
+    end)
     self.db:ResetDB()
 end
 
@@ -89,8 +114,23 @@ function ZUI_LickAndTickle:OnDisable()
     LAT_GUI.LickAndTickle:Hide()
 end
 
-function ZUI_LickAndTickle:CreateNamePlateUI()
-    
+function ZUI_LickAndTickle:CreateNamePlateUI(bgFile, namePlate)
+    local backdropInfo =
+    {
+        bgFile = bgFile,
+        tile = true,
+        tileEdge = true,
+        tileSize = 15,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 },
+    }
+
+    local frame = CreateFrame("Frame", nil, namePlate, "BackdropTemplate")
+    frame:SetBackdrop(backdropInfo)
+    frame:SetFrameStrata("HIGH")
+    frame:SetFrameLevel(0)
+    frame:SetSize(15, 15)
+    frame:SetPoint("CENTER", -70, -10)
+    table.insert(LAT_GUI.backdropTable, frame)
 end
 
 function ZUI_LickAndTickle:CreateBtns(frameName, parent, btnText, emote)
@@ -132,5 +172,4 @@ function ZUI_LickAndTickle:btnClicked(emote)
 end
 
 --
-
 
