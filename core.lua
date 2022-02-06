@@ -47,6 +47,36 @@ function ZUI_LickAndTickle:OnInitialize()
     ZUI_LickAndTickle:CreateBtns("tickleFrame", lickAndTickle, "Tickle", "tickle")
     ZUI_LickAndTickle:CreateBtns("lickFrame", tickleFrame, "Lick", "lick")
     ZUI_LickAndTickle:CreateNamePlateUI()
+    LAT_GUI.LickAndTickle:RegisterEvent("NAME_PLATE_UNIT_ADDED")
+    LAT_GUI.LickAndTickle:SetScript("OnEvent", function(self, event, ...)
+        if (event == "NAME_PLATE_UNIT_ADDED") then
+            local nameplateid = ...
+            local nameplateUnitGuid = UnitGUID(nameplateid)
+            local unitname = UnitName(nameplateid)
+            local inLickDB = false
+            for i, item in ipairs(ZUI_LickAndTickle.db.profile.licked) do
+                if (item == unitname) then inLickDB = true end
+            end
+            if (inLickDB == false) then 
+                ZUI_LickAndTickle:CreateNamePlateUI()
+                
+            end 
+            local inTickleDB = false
+            for i, item in ipairs(ZUI_LickAndTickle.db.profile.tickled) do
+                if (item == unitname) then inTickleDB = true end
+            end
+            if (inTickleDB == false) then 
+                ZUI_LickAndTickle:CreateNamePlateUI() 
+                
+            end 
+            local namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).UnitFrame
+            LAT_GUI.namePlate = namePlate
+            LAT_GUI.namePlate.newFrame = CreateFrame("Button")
+            LAT_GUI.namePlate:Hide()
+            if (LAT_GUI.namePlate) then print("yes") end
+        end
+    end)
+
     self.db:ResetDB()
 end
 
@@ -60,22 +90,7 @@ function ZUI_LickAndTickle:OnDisable()
 end
 
 function ZUI_LickAndTickle:CreateNamePlateUI()
-    LAT_GUI.LickAndTickle:RegisterEvent("NAME_PLATE_UNIT_ADDED")
-    LAT_GUI.LickAndTickle:SetScript("OnEvent", function(self, event, ...)
-        if (event == "NAME_PLATE_UNIT_ADDED") then
-            local nameplateid = ...
-            local nameplateUnitGuid = UnitGUID(nameplateid)
-            local unitname = UnitName(nameplateid)
-            local inTheDB = false
-            for i, item in ipairs(ZUI_LickAndTickle.db.profile.licked) do
-                if (item == unitname) then inTheDB = true end
-            end
-            if (inTheDB == false) then 
-                print(unitname) 
-                table.insert(ZUI_LickAndTickle.db.profile.licked, unitname) 
-            end 
-        end
-    end)
+    
 end
 
 function ZUI_LickAndTickle:CreateBtns(frameName, parent, btnText, emote)
@@ -116,5 +131,6 @@ function ZUI_LickAndTickle:btnClicked(emote)
     end
 end
 
+--
 
 
