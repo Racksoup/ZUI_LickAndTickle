@@ -41,20 +41,41 @@ local defaults = {
 function ZUI_LickAndTickle:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("ZUI_LickAndTickleDB", defaults, true)
     icon:Register("ZUI_LickAndTickle", ZUI_LDB, self.db.profile.minimap)
-    self.db:ResetDB()
     LAT_GUI.LickAndTickle = CreateFrame("Frame", "lickAndTickle", UIParent)
     LAT_GUI.LickAndTickle:SetSize(200,200)
     LAT_GUI.LickAndTickle:SetPoint("TOPLEFT", 100, -100)
     ZUI_LickAndTickle:CreateBtns("tickleFrame", lickAndTickle, "Tickle", "tickle")
     ZUI_LickAndTickle:CreateBtns("lickFrame", tickleFrame, "Lick", "lick")
+    ZUI_LickAndTickle:CreateNamePlateUI()
+    self.db:ResetDB()
 end
 
 function ZUI_LickAndTickle:OnEnable()
     LAT_GUI.LickAndTickle:Show()
+    
 end
 
 function ZUI_LickAndTickle:OnDisable()
     LAT_GUI.LickAndTickle:Hide()
+end
+
+function ZUI_LickAndTickle:CreateNamePlateUI()
+    LAT_GUI.LickAndTickle:RegisterEvent("NAME_PLATE_UNIT_ADDED")
+    LAT_GUI.LickAndTickle:SetScript("OnEvent", function(self, event, ...)
+        if (event == "NAME_PLATE_UNIT_ADDED") then
+            local nameplateid = ...
+            local nameplateUnitGuid = UnitGUID(nameplateid)
+            local unitname = UnitName(nameplateid)
+            local inTheDB = false
+            for i, item in ipairs(ZUI_LickAndTickle.db.profile.licked) do
+                if (item == unitname) then inTheDB = true end
+            end
+            if (inTheDB == false) then 
+                print(unitname) 
+                table.insert(ZUI_LickAndTickle.db.profile.licked, unitname) 
+            end 
+        end
+    end)
 end
 
 function ZUI_LickAndTickle:CreateBtns(frameName, parent, btnText, emote)
@@ -96,14 +117,4 @@ function ZUI_LickAndTickle:btnClicked(emote)
 end
 
 
-local framex = CreateFrame("Frame")
-local timeElapsed = 0
-framex:RegisterEvent("NAME_PLATE_UNIT_ADDED")
-framex:SetScript("OnEvent", function(self, event, ...)
-    if (event == "NAME_PLATE_UNIT_ADDED") then
-        local nameplateid = ...
-        local nameplateUnitGuid = UnitGUID(nameplateid)
-        local unitname = UnitName(nameplateid)
-        print(unitname)
-    end
-end)
+
