@@ -6,7 +6,7 @@ local ZUI_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("ZUI_LickAndTickle", 
     text = L["ZUI Lick and Tickle"],
     icon = GetItemIcon(5041),
     OnClick = function()
-        if (LAT_GUI.frame:IsVisible())
+        if (LAT_GUI.LickAndTickle:IsVisible())
         then
             ZUI_LickAndTickle:OnDisable();
         else
@@ -50,21 +50,21 @@ function ZUI_LickAndTickle:OnEnable()
 end
 
 function ZUI_LickAndTickle:OnDisable()
-    LAT_GUI.frame:Hide()
+    LAT_GUI.LickAndTickle:Hide()
 end
 
 function ZUI_LickAndTickle:CreateBtns(frameName, parent, btnText, emote)
     local points = {}
     if (btnText == "Tickle") then points[1] = 100 points[2] = -100 else points[1] = 0 points[2] = -40  end
-    LAT_GUI.frame = CreateFrame("Button", frameName, parent)
+    LAT_GUI.LickAndTickle = CreateFrame("Button", frameName, parent)
     
-    LAT_GUI.frame:SetFrameStrata("HIGH")
-    LAT_GUI.frame:SetFrameLevel(0)
-    LAT_GUI.frame:SetSize(64, 20)
-    LAT_GUI.frame:SetPoint("TOPLEFT", points[1], points[2])
-    LAT_GUI.frame:SetScript("OnClick", function() ZUI_LickAndTickle:btnClicked(emote) end)
+    LAT_GUI.LickAndTickle:SetFrameStrata("HIGH")
+    LAT_GUI.LickAndTickle:SetFrameLevel(0)
+    LAT_GUI.LickAndTickle:SetSize(64, 20)
+    LAT_GUI.LickAndTickle:SetPoint("TOPLEFT", points[1], points[2])
+    LAT_GUI.LickAndTickle:SetScript("OnClick", function() ZUI_LickAndTickle:btnClicked(emote) end)
     
-    text = LAT_GUI.frame:CreateFontString("text", "HIGH")
+    text = LAT_GUI.LickAndTickle:CreateFontString("text", "HIGH")
     text:SetPoint("CENTER")
     text:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
     text:SetText(btnText)  
@@ -81,7 +81,6 @@ function ZUI_LickAndTickle:btnClicked(emote)
             if (name == target) then isInDB = true end
         end
         if (isInDB == false) then table.insert(self.db.profile.tickled, target) end
-        
     else
         if (#self.db.profile.licked == 0) then table.insert(self.db.profile.licked, target) end
         local isInDB = false;
@@ -89,6 +88,18 @@ function ZUI_LickAndTickle:btnClicked(emote)
             if (name == target) then isInDB = true end
         end
         if (isInDB == false) then table.insert(self.db.profile.licked, target) end
-        
     end
 end
+
+
+local framex = CreateFrame("Frame")
+local timeElapsed = 0
+framex:RegisterEvent("NAME_PLATE_UNIT_ADDED")
+framex:SetScript("OnEvent", function(self, event, ...)
+    if (event == "NAME_PLATE_UNIT_ADDED") then
+        local nameplateid = ...
+        local nameplateUnitGuid = UnitGUID(nameplateid)
+        local unitname = UnitName(nameplateid)
+        print(unitname)
+    end
+end)
