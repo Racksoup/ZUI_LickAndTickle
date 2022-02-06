@@ -42,11 +42,15 @@ function ZUI_LickAndTickle:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("ZUI_LickAndTickleDB", defaults, true)
     icon:Register("ZUI_LickAndTickle", ZUI_LDB, self.db.profile.minimap)
     self.db:ResetDB()
+    LAT_GUI.LickAndTickle = CreateFrame("Frame", "lickAndTickle", UIParent)
+    LAT_GUI.LickAndTickle:SetSize(200,200)
+    LAT_GUI.LickAndTickle:SetPoint("TOPLEFT", 100, -100)
+    ZUI_LickAndTickle:CreateBtns("tickleFrame", lickAndTickle, "Tickle", "tickle")
+    ZUI_LickAndTickle:CreateBtns("lickFrame", tickleFrame, "Lick", "lick")
 end
 
 function ZUI_LickAndTickle:OnEnable()
-    ZUI_LickAndTickle:CreateBtns("tickleFrame", UIParent, "Tickle", "tickle")
-    ZUI_LickAndTickle:CreateBtns("lickFrame", tickleFrame, "Lick", "lick")
+    LAT_GUI.LickAndTickle:Show()
 end
 
 function ZUI_LickAndTickle:OnDisable()
@@ -55,16 +59,16 @@ end
 
 function ZUI_LickAndTickle:CreateBtns(frameName, parent, btnText, emote)
     local points = {}
-    if (btnText == "Tickle") then points[1] = 100 points[2] = -100 else points[1] = 0 points[2] = -40  end
-    LAT_GUI.LickAndTickle = CreateFrame("Button", frameName, parent)
+    if (btnText == "Tickle") then points[1] = 0 points[2] = 0 else points[1] = 0 points[2] = -40  end
+    local btnFrame = CreateFrame("Button", frameName, parent)
     
-    LAT_GUI.LickAndTickle:SetFrameStrata("HIGH")
-    LAT_GUI.LickAndTickle:SetFrameLevel(0)
-    LAT_GUI.LickAndTickle:SetSize(64, 20)
-    LAT_GUI.LickAndTickle:SetPoint("TOPLEFT", points[1], points[2])
-    LAT_GUI.LickAndTickle:SetScript("OnClick", function() ZUI_LickAndTickle:btnClicked(emote) end)
+    btnFrame:SetFrameStrata("HIGH")
+    btnFrame:SetFrameLevel(0)
+    btnFrame:SetSize(64, 20)
+    btnFrame:SetPoint("TOPLEFT", points[1], points[2])
+    btnFrame:SetScript("OnClick", function() ZUI_LickAndTickle:btnClicked(emote) end)
     
-    text = LAT_GUI.LickAndTickle:CreateFontString("text", "HIGH")
+    text = btnFrame:CreateFontString("text", "HIGH")
     text:SetPoint("CENTER")
     text:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
     text:SetText(btnText)  
