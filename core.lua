@@ -29,7 +29,7 @@ local options = {
 }
 
 local defaults = {
-    profile = {
+    realm = {
         minimap = {
             hide = false,
         },
@@ -50,7 +50,7 @@ function ZUI_LickAndTickle:OnInitialize()
     LAT_GUI.backdropTable = {}
     LAT_GUI.plateTable = {}
     self.db = LibStub("AceDB-3.0"):New("ZUI_LickAndTickleDB", defaults, true)
-    icon:Register("ZUI_LickAndTickle", ZUI_LDB, self.db.profile.minimap)
+    icon:Register("ZUI_LickAndTickle", ZUI_LDB, self.db.realm.minimap)
     LAT_GUI.LickAndTickle = CreateFrame("Frame", "lickAndTickle", UIParent)
     LAT_GUI.LickAndTickle:SetSize(200,200)
     LAT_GUI.LickAndTickle:SetPoint("TOPLEFT", 100, -100)
@@ -71,7 +71,7 @@ function ZUI_LickAndTickle:OnInitialize()
             ZUI_LickAndTickle:NamePlateRemoved(nameplateid)    
         end
     end)
-    self.db:ResetDB()
+    --self.db:ResetDB()
 end
 
 function ZUI_LickAndTickle:OnEnable()
@@ -97,10 +97,10 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
     local inTickleDB = false
     local inAnyDB = true
 
-    for i, item in ipairs(ZUI_LickAndTickle.db.profile.licked) do
+    for i, item in ipairs(ZUI_LickAndTickle.db.realm.licked) do
         if (item == unitname) then inLickDB = true end
     end
-    for i, item in ipairs(ZUI_LickAndTickle.db.profile.tickled) do
+    for i, item in ipairs(ZUI_LickAndTickle.db.realm.tickled) do
         if (item == unitname) then inTickleDB = true end
     end
     if (inLickDB == false and inTickleDB == false) then
@@ -142,14 +142,8 @@ function ZUI_LickAndTickle:CreateNamePlateUI(bgFile, namePlate, nameplateid, uni
     frame:SetFrameLevel(0)
     frame:SetSize(15, 15)
     frame:SetPoint("CENTER", -70, -10)
- 
-
-    -- new frames not added in when not last in backdropTable
     if(frame.unitname) then
         table.insert(LAT_GUI.backdropTable, frame)
-        -- for i, v in pairs(LAT_GUI.backdropTable) do
-        --     print(i, "==", v.unitname)
-        -- end
     end
 end
 
@@ -177,22 +171,22 @@ function ZUI_LickAndTickle:btnClicked(emote)
     local locClass, engClass, locRace, engRace, gender, name, server = GetPlayerInfoByGUID(unitGuid)
 
     if (emote == "tickle" and locClass) then 
-        if (#self.db.profile.tickled == 0) then table.insert(self.db.profile.tickled, target) end
+        if (#self.db.realm.tickled == 0) then table.insert(self.db.realm.tickled, target) end
         local isInDB = false;
-        for i, name in ipairs(self.db.profile.tickled) do
+        for i, name in ipairs(self.db.realm.tickled) do
             if (name == target) then isInDB = true end
         end
         if (isInDB == false) then 
-            table.insert(self.db.profile.tickled, target) 
+            table.insert(self.db.realm.tickled, target) 
         end
     elseif (emote == "lick" and locClass) then
-        if (#self.db.profile.licked == 0) then table.insert(self.db.profile.licked, target) end
+        if (#self.db.realm.licked == 0) then table.insert(self.db.realm.licked, target) end
         local isInDB = false;
-        for i, name in ipairs(self.db.profile.licked) do
+        for i, name in ipairs(self.db.realm.licked) do
             if (name == target) then isInDB = true end
         end
         if (isInDB == false) then 
-            table.insert(self.db.profile.licked, target) 
+            table.insert(self.db.realm.licked, target) 
         end
     end
     
@@ -207,13 +201,12 @@ function ZUI_LickAndTickle:btnClicked(emote)
             return
         end
     end
-
-   
 end
 
 
 -- chat command text on minimap button
 -- enable friendly nameplates on minimap button click
 -- right click minimap for emote input frame
+-- make it work with plater??
 
 -- enable user to enter any one emote to replace lick&tickle
