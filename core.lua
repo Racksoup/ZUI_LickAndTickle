@@ -149,15 +149,17 @@ end
 function ZUI_LickAndTickle:btnClicked(emote)
     DoEmote(emote)
     local target = GetUnitName("target")
+    local unitGuid = UnitGUID("target")
+    local locClass, engClass, locRace, engRace, gender, name, server = GetPlayerInfoByGUID(unitGuid)
 
-    if (emote == "tickle") then 
+    if (emote == "tickle" and locClass) then 
         if (#self.db.profile.tickled == 0) then table.insert(self.db.profile.tickled, target) end
         local isInDB = false;
         for i, name in ipairs(self.db.profile.tickled) do
             if (name == target) then isInDB = true end
         end
         if (isInDB == false) then table.insert(self.db.profile.tickled, target) end
-    else
+    elseif (emote == "lick" and locClass) then
         if (#self.db.profile.licked == 0) then table.insert(self.db.profile.licked, target) end
         local isInDB = false;
         for i, name in ipairs(self.db.profile.licked) do
