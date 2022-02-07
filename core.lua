@@ -93,11 +93,14 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
     
     local unitname = UnitName(nameplateid)
     local unitGuid = UnitGUID(nameplateid)
+    local isPlaterAddon = false
     local namePlate
     if (C_NamePlate.GetNamePlateForUnit(nameplateid).unitFrame) then
         namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).unitFrame
+        isPlaterAddon = true
     else
         namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).UnitFrame
+        isPlaterAddon = false
     end
     local locClass, engClass, locRace, engRace, gender, name, server = GetPlayerInfoByGUID(unitGuid)
     local inLickDB = false
@@ -117,9 +120,9 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
         inAnyDB = true
     end
 
-    if (inAnyDB == false and locClass) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\RedBall.blp", namePlate, nameplateid, unitGuid, unitname) 
-    elseif (inAnyDB == true and inLickDB == false and locClass) then  ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\BlueBall.blp", namePlate, nameplateid, unitGuid, unitname) 
-    elseif (inAnyDB == true and inTickleDB == false and locClass) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate, nameplateid, unitGuid, unitname) 
+    if (inAnyDB == false and locClass) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\RedBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
+    elseif (inAnyDB == true and inLickDB == false and locClass) then  ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\BlueBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
+    elseif (inAnyDB == true and inTickleDB == false and locClass) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
     end
 end
 
@@ -129,7 +132,7 @@ function ZUI_LickAndTickle:NamePlateRemoved(nameplateid)
     end
 end
 
-function ZUI_LickAndTickle:CreateNamePlateUI(bgFile, namePlate, nameplateid, unitGuid, unitname)
+function ZUI_LickAndTickle:CreateNamePlateUI(bgFile, namePlate, nameplateid, unitGuid, unitname, isPlaterAddon)
     
     local backdropInfo =
     {
@@ -150,7 +153,7 @@ function ZUI_LickAndTickle:CreateNamePlateUI(bgFile, namePlate, nameplateid, uni
     frame:SetFrameStrata("HIGH")
     frame:SetFrameLevel(0)
     frame:SetSize(15, 15)
-    frame:SetPoint("CENTER", -70, -10)
+    if(isPlaterAddon) then frame:SetPoint("CENTER", -35, 11) else frame:SetPoint("CENTER", -70, -7) end
     if(frame.unitname) then
         table.insert(LAT_GUI.backdropTable, frame)
     end
