@@ -15,7 +15,10 @@ local ZUI_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("ZUI_LickAndTickle", 
         end
     end,
     OnTooltipShow = function(tooltip)
-        tooltip:SetText(L["ZUI Lick and Tickle"])
+        tooltip:AddLine(L["ZUI Lick and Tickle"], 0, .9, 1)
+        tooltip:AddLine(L["|cFFCFCFCFLeft click|r: Show/Hide UI"])
+        tooltip:AddLine(L["|cFFCFCFCFRight click|r: Change Emote"])
+        tooltip:AddLine(L["|cFFCFCFCF/resetdb to reset|r"])
     end,
 })
 local icon = LibStub("LibDBIcon-1.0")
@@ -224,10 +227,6 @@ function ZUI_LickAndTickle:btnClicked(emote)
     end
 
 end
-
-
--- chat command text on minimap button
--- reposition nameplate-Icon for plater addon
 
 -- right click minimap for emote input frame
 -- enable user to enter any one emote to replace lick&tickle
