@@ -75,7 +75,10 @@ end
 
 function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
     local unitname = UnitName(nameplateid)
+    local unitGuid = UnitGUID(nameplateid)
     local namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).UnitFrame
+    local locClass, engClass, locRace, engRace, gender, name, server = GetPlayerInfoByGUID(unitGuid)
+
     local inLickDB = false
     local inTickleDB = false
     local inAnyDB = true
@@ -92,9 +95,9 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
         inAnyDB = true
     end
 
-    if (inAnyDB == false) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\RedBall.blp", namePlate, nameplateid) 
-    elseif (inAnyDB == true and inLickDB == false) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\BlueBall.blp", namePlate, nameplateid) 
-    elseif (inAnyDB == true and inTickleDB == false) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate, nameplateid) 
+    if (inAnyDB == false and locClass) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\RedBall.blp", namePlate, nameplateid) 
+    elseif (inAnyDB == true and inLickDB == false and locClass) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\BlueBall.blp", namePlate, nameplateid) 
+    elseif (inAnyDB == true and inTickleDB == false and locClass) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate, nameplateid) 
     end
 end
 
@@ -164,5 +167,5 @@ function ZUI_LickAndTickle:btnClicked(emote)
     end
 end
 
--- only players
 -- when licked change nameplate icon immediatly
+-- disable plateicon on minimap button click
