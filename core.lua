@@ -66,11 +66,16 @@ end
 
 function ZUI_LickAndTickle:OnEnable()
     LAT_GUI.LickAndTickle:Show()
-    
+    for i,item in ipairs(LAT_GUI.backdropTable) do
+        item:Show()
+    end
 end
 
 function ZUI_LickAndTickle:OnDisable()
     LAT_GUI.LickAndTickle:Hide()
+    for i,item in ipairs(LAT_GUI.backdropTable) do
+        item:Hide()
+    end
 end
 
 function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
