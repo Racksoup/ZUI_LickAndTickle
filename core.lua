@@ -11,6 +11,7 @@ local ZUI_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("ZUI_LickAndTickle", 
             ZUI_LickAndTickle:OnDisable();
         else
             ZUI_LickAndTickle:OnEnable();
+            SetCVar("nameplateShowFriends", 1)
         end
     end,
     OnTooltipShow = function(tooltip)
@@ -89,13 +90,20 @@ function ZUI_LickAndTickle:OnDisable()
 end
 
 function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
+    
     local unitname = UnitName(nameplateid)
     local unitGuid = UnitGUID(nameplateid)
-    local namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).UnitFrame
+    local namePlate
+    if (C_NamePlate.GetNamePlateForUnit(nameplateid).unitFrame) then
+        namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).unitFrame
+    else
+        namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).UnitFrame
+    end
     local locClass, engClass, locRace, engRace, gender, name, server = GetPlayerInfoByGUID(unitGuid)
     local inLickDB = false
     local inTickleDB = false
     local inAnyDB = true
+    namePlate:Show()
 
     for i, item in ipairs(ZUI_LickAndTickle.db.realm.licked) do
         if (item == unitname) then inLickDB = true end
@@ -122,6 +130,7 @@ function ZUI_LickAndTickle:NamePlateRemoved(nameplateid)
 end
 
 function ZUI_LickAndTickle:CreateNamePlateUI(bgFile, namePlate, nameplateid, unitGuid, unitname)
+    
     local backdropInfo =
     {
         bgFile = bgFile,
@@ -165,6 +174,10 @@ function ZUI_LickAndTickle:CreateBtns(frameName, parent, btnText, emote)
 end
 
 function ZUI_LickAndTickle:btnClicked(emote)
+    for i, v in ipairs(LAT_GUI.backdropTable) do
+        print(i, "=", v)
+    end
+
     DoEmote(emote)
     local target = GetUnitName("target")
     local unitGuid = UnitGUID("target")
@@ -194,19 +207,24 @@ function ZUI_LickAndTickle:btnClicked(emote)
         if (item.unitname == target) then 
             table.remove(LAT_GUI.backdropTable, i) 
             item:Hide()
-            local namePlate = C_NamePlate.GetNamePlateForUnit(item.nameplateid).UnitFrame
+            local namePlate
+            if (C_NamePlate.GetNamePlateForUnit(item.nameplateid).unitFrame) then
+                namePlate = C_NamePlate.GetNamePlateForUnit(item.nameplateid).unitFrame
+            else
+                namePlate = C_NamePlate.GetNamePlateForUnit(item.nameplateid).UnitFrame
+            end
             if (item.bgFile == "Interface\\AddOns\\ZUI_LickAndTickle\\images\\RedBall.blp" and namePlate) then 
                 ZUI_LickAndTickle:NamePlateAdded(item.nameplateid)
             end
             return
         end
     end
+
 end
 
 
 -- chat command text on minimap button
--- enable friendly nameplates on minimap button click
--- right click minimap for emote input frame
--- make it work with plater??
+-- reposition nameplate-Icon for plater addon
 
+-- right click minimap for emote input frame
 -- enable user to enter any one emote to replace lick&tickle
