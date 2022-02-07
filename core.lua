@@ -54,70 +54,11 @@ function ZUI_LickAndTickle:OnInitialize()
     LAT_GUI.LickAndTickle:SetScript("OnEvent", function(self, event, ...)
         if (event == "NAME_PLATE_UNIT_ADDED") then
             local nameplateid = ...
-            local unitname = UnitName(nameplateid)
-            local namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).UnitFrame
-            local inLickDB = false
-            local inTickleDB = false
-            local inAnyDB = true
-
-            
-
-            for i, item in ipairs(ZUI_LickAndTickle.db.profile.licked) do
-                if (item == unitname) then inLickDB = true end
-            end
-            for i, item in ipairs(ZUI_LickAndTickle.db.profile.tickled) do
-                if (item == unitname) then inTickleDB = true end
-            end
-            if (inLickDB == false and inTickleDB == false) then
-                inAnyDB = false
-            else
-                inAnyDB = true
-            end
-
-           
-
-            print("inAnyDB = ", inAnyDB, "\t inLickDB = ", inLickDB, "\t inTickleDB = ", inTickleDB)
-            
-            if (inAnyDB == false) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\RedBall.blp", namePlate, nameplateid) 
-            elseif (inAnyDB == true and inLickDB == false) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\BlueBall.blp", namePlate, nameplateid) 
-            elseif (inAnyDB == true and inTickleDB == false) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate, nameplateid) 
-            end
-                 
-            -- for i, item in pairs(LAT_GUI.backdropTable) do
-            --     print(i, "=", item.num)
-            -- end
-
-            --local nameplateUnitGuid = UnitGUID(nameplateid)
-            
-            -- for i, k in pairs(namePlate) do
-            --     print(i, "---", k)
-            -- end
-
-            -- local itemframe = CreateFrame("Frame", nil, LAT_GUI.namePlate, "BackdropTemplate")
-            -- itemframe:SetFrameStrata("HIGH")
-            -- itemframe:SetFrameLevel(0)
-            -- itemframe:SetSize(64, 20)
-            -- itemframe:SetPoint("CENTER", 0, 0)
-            -- itemframe:SetBackdropColor(0, 0, 1, .5)
-
-            --local btn = ZUI_LickAndTickle:CreateBtns(nil, itemframe, "LICK ME!!", "lick")
-
-            -- local itemtext = itemframe:CreateFontString("text", "HIGH")
-            -- itemtext:SetPoint("CENTER")
-            -- itemtext:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
-            -- itemtext:SetText("HELLO WORLD!!!")  
-
-            -- LAT_GUI.namePlate.name:SetText("BoB")
+            ZUI_LickAndTickle:NamePlateAdded(nameplateid)
         end
-
-        
-
         if (event == "NAME_PLATE_UNIT_REMOVED") then
             local nameplateid = ...
-            
-            for i, item in ipairs(LAT_GUI.backdropTable) do
-                if (nameplateid == item.num) then table.remove(LAT_GUI.backdropTable, i) item:Hide() end
-            end
+            ZUI_LickAndTickle:NamePlateRemoved(nameplateid)    
         end
     end)
     self.db:ResetDB()
@@ -132,8 +73,38 @@ function ZUI_LickAndTickle:OnDisable()
     LAT_GUI.LickAndTickle:Hide()
 end
 
+function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
+    local unitname = UnitName(nameplateid)
+    local namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).UnitFrame
+    local inLickDB = false
+    local inTickleDB = false
+    local inAnyDB = true
+
+    for i, item in ipairs(ZUI_LickAndTickle.db.profile.licked) do
+        if (item == unitname) then inLickDB = true end
+    end
+    for i, item in ipairs(ZUI_LickAndTickle.db.profile.tickled) do
+        if (item == unitname) then inTickleDB = true end
+    end
+    if (inLickDB == false and inTickleDB == false) then
+        inAnyDB = false
+    else
+        inAnyDB = true
+    end
+
+    if (inAnyDB == false) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\RedBall.blp", namePlate, nameplateid) 
+    elseif (inAnyDB == true and inLickDB == false) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\BlueBall.blp", namePlate, nameplateid) 
+    elseif (inAnyDB == true and inTickleDB == false) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate, nameplateid) 
+    end
+end
+
+function ZUI_LickAndTickle:NamePlateRemoved(nameplateid)
+    for i, item in ipairs(LAT_GUI.backdropTable) do
+        if (nameplateid == item.num) then table.remove(LAT_GUI.backdropTable, i) item:Hide() end
+    end
+end
+
 function ZUI_LickAndTickle:CreateNamePlateUI(bgFile, namePlate, nameplateid)
-    print("hit")
     local backdropInfo =
     {
         bgFile = bgFile,
@@ -193,5 +164,5 @@ function ZUI_LickAndTickle:btnClicked(emote)
     end
 end
 
---
-
+-- only players
+-- when licked change nameplate icon immediatly
