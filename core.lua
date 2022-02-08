@@ -73,9 +73,6 @@ function ZUI_LickAndTickle:OnInitialize()
     ZUI_LickAndTickle:CreateBtns("lickFrame", lickAndTickle, L["Lick"], "lick")
     ZUI_LickAndTickle:CreateBtns("otherFrame", lickAndTickle, self.db.realm.otherText, self.db.realm.otherEmote)
     ZUI_LickAndTickle:CreateNamePlateUI()
-
-    local timeElapsed = 0
-    
     --self.db:ResetDB()
 end
 
