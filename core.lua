@@ -88,7 +88,7 @@ function ZUI_LickAndTickle:OnInitialize()
             SetCVar("nameplateShowFriends", 1)
         end
     end) 
-    self.db:ResetDB()
+    --self.db:ResetDB()
 end
 
 function ZUI_LickAndTickle:OnEnable()
