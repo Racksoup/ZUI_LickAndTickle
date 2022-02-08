@@ -183,8 +183,8 @@ function ZUI_LickAndTickle:CreateNamePlateUI(bgFile, namePlate, nameplateid, uni
         bgFile = bgFile,
         tile = true,
         tileEdge = true,
-        tileSize = 15,
-        insets = { left = 1, right = 1, top = 1, bottom = 1 },
+        tileSize = 20,
+        insets = { left = 0, right = 0, top = 0, bottom = 0 },
     }
 
     local frame = CreateFrame("Frame", nil, namePlate, "BackdropTemplate")
@@ -196,7 +196,7 @@ function ZUI_LickAndTickle:CreateNamePlateUI(bgFile, namePlate, nameplateid, uni
     frame:SetBackdrop(backdropInfo)
     frame:SetFrameStrata("HIGH")
     frame:SetFrameLevel(0)
-    frame:SetSize(15, 15)
+    frame:SetSize(18, 18)
     if(isPlaterAddon) then frame:SetPoint("CENTER", -35, 11) else frame:SetPoint("CENTER", -70, -7) end
     if(frame.unitname) then
         table.insert(LAT_GUI.iconTable, frame)
@@ -458,4 +458,3 @@ end
 -- fix re-show nameplates not always reseting profile
 
 -- fix LAT_GUI.buttonTable duplicate values
--- fix icon on highlight clipping
