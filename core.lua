@@ -54,8 +54,8 @@ SlashCmdList["RESETDB"] = function()
 end 
 
 function ZUI_LickAndTickle:OnInitialize()
-    LAT_GUI.buttonFrames = {}
-    LAT_GUI.backdropTable = {}
+    LAT_GUI.buttonTable = {}
+    LAT_GUI.iconTable = {}
     LAT_GUI.plateTable = {}
     self.db = LibStub("AceDB-3.0"):New("ZUI_LickAndTickleDB", defaults, true)
     icon:Register("ZUI_LickAndTickle", ZUI_LDB, self.db.realm.minimap)
@@ -93,22 +93,25 @@ end
 
 function ZUI_LickAndTickle:OnEnable()
     LAT_GUI.LickAndTickle:Show()
-    for i,item in ipairs(LAT_GUI.backdropTable) do
+    for i,item in ipairs(LAT_GUI.iconTable) do
         item:Show()
     end
 end
 
 function ZUI_LickAndTickle:OnDisable()
     LAT_GUI.LickAndTickle:Hide()
-    for i,item in ipairs(LAT_GUI.backdropTable) do
+    for i,item in ipairs(LAT_GUI.iconTable) do
         item:Hide()
     end
 end
 
 function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
+    for i, v in ipairs(LAT_GUI.iconTable) do
+        if (nameplateid == v.nameplateid) then v:Hide() end
+    end
     if (ZUI_LickAndTickle.db.realm.otherEmote) then
         LAT_GUI.profile2 = true
-        for i, v in pairs(LAT_GUI.buttonFrames) do
+        for i, v in pairs(LAT_GUI.buttonTable) do
             if (v.btnText == "Lick" or v.btnText == "Tickle") then
                v:Hide() 
             else
@@ -117,7 +120,7 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
         end
     else
         LAT_GUI.profile2 = false
-        for i, v in pairs(LAT_GUI.buttonFrames) do
+        for i, v in pairs(LAT_GUI.buttonTable) do
             if (v.btnText ~= "Lick" and v.btnText ~= "Tickle") then
                 v:Hide() 
             end
@@ -143,6 +146,8 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
     
     namePlate:Show()
 
+    if(LAT_GUI.profile2 == true) then inLickDB = true inTickleDB = true end
+
     for i, item in ipairs(ZUI_LickAndTickle.db.realm.licked) do
         if (item == unitname) then inLickDB = true end
     end
@@ -166,8 +171,8 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
 end
 
 function ZUI_LickAndTickle:NamePlateRemoved(nameplateid)
-    for i, item in ipairs(LAT_GUI.backdropTable) do
-        if (nameplateid == item.num) then table.remove(LAT_GUI.backdropTable, i) item:Hide() end
+    for i, item in ipairs(LAT_GUI.iconTable) do
+        if (nameplateid == item.nameplateid) then table.remove(LAT_GUI.iconTable, i) item:Hide() end
     end
 end
 
@@ -184,7 +189,7 @@ function ZUI_LickAndTickle:CreateNamePlateUI(bgFile, namePlate, nameplateid, uni
 
     local frame = CreateFrame("Frame", nil, namePlate, "BackdropTemplate")
     frame.unitname = unitname
-    frame.num = nameplateid
+    frame.nameplateid = nameplateid
     frame.Guid = unitGuid
     frame.nameplateid = nameplateid
     frame.bgFile = bgFile
@@ -194,13 +199,13 @@ function ZUI_LickAndTickle:CreateNamePlateUI(bgFile, namePlate, nameplateid, uni
     frame:SetSize(15, 15)
     if(isPlaterAddon) then frame:SetPoint("CENTER", -35, 11) else frame:SetPoint("CENTER", -70, -7) end
     if(frame.unitname) then
-        table.insert(LAT_GUI.backdropTable, frame)
+        table.insert(LAT_GUI.iconTable, frame)
     end
 end
 
 function ZUI_LickAndTickle:CreateBtns(frameName, parent, btnText, emote)
     local points = {0, 0}
-    print(frameName, parent, btnText, emote)
+
 
     if (btnText == "Lick") then points[1] = 0 points[2] = -40  end
     btnFrame = CreateFrame("Button", frameName, parent)
@@ -218,7 +223,7 @@ function ZUI_LickAndTickle:CreateBtns(frameName, parent, btnText, emote)
     text:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
     text:SetText(btnText)  
 
-    table.insert(LAT_GUI.buttonFrames, btnFrame)
+    table.insert(LAT_GUI.buttonTable, btnFrame)
 end
 
 function ZUI_LickAndTickle:btnClicked(emote)
@@ -246,20 +251,28 @@ function ZUI_LickAndTickle:btnClicked(emote)
             if (isInDB == false) then 
                 table.insert(self.db.realm.licked, target) 
             end
-        elseif (emote == self.db.realm.other and locClass) then
-            if (#self.db.realm.other == 0) then table.insert(self.db.realm.other, target) end
-            local isInDB = false;
-            for i, name in ipairs(self.db.realm.other) do
-                if (name == target) then isInDB = true end
+        elseif (locClass) then
+            local isInEmotes = false
+            for i, v in pairs(ZUI_LickAndTickle.emotes) do
+                for j, k in ipairs(v) do
+                if (emote == k.emote) then isInEmotes = true end
+                end
             end
-            if (isInDB == false) then 
-                table.insert(self.db.realm.other, target) 
+            if (isInEmotes) then 
+                if (#self.db.realm.other == 0) then table.insert(self.db.realm.other, target) end
+                local isInDB = false;
+                for i, name in ipairs(self.db.realm.other) do
+                    if (name == target) then isInDB = true end
+                end
+                if (isInDB == false) then 
+                    table.insert(self.db.realm.other, target) 
+                end
             end
         end
         
-        for i, item in pairs(LAT_GUI.backdropTable) do
+        for i, item in pairs(LAT_GUI.iconTable) do
             if (item.unitname == target) then 
-                table.remove(LAT_GUI.backdropTable, i) 
+                table.remove(LAT_GUI.iconTable, i) 
                 item:Hide()
                 local namePlate
                 if (C_NamePlate.GetNamePlateForUnit(item.nameplateid).unitFrame) then
@@ -357,13 +370,13 @@ function ZUI_LickAndTickle:InputEntered(self, event, ...)
         if (notFound == true) then
             print("bad input - try again")
         else
-            for i, v in pairs(LAT_GUI.buttonFrames) do
+            for i, v in pairs(LAT_GUI.buttonTable) do
                 if (v.emote == "lick" or v.emote == "tickle") then
                     v:Hide()
                 end
                 if (v.emote == oldEmote) then
                     v:Hide()
-                    table.remove(LAT_GUI.buttonFrames, i)
+                    table.remove(LAT_GUI.buttonTable, i)
                 end
             end
             SetCVar("nameplateShowFriends", 0)
@@ -411,13 +424,13 @@ function ZUI_LickAndTickle:EnterBtnPressed(self, button, down)
     if (notFound == true) then
         print("bad input - try again")
     else
-        for i, v in pairs(LAT_GUI.buttonFrames) do
+        for i, v in pairs(LAT_GUI.buttonTable) do
             if (v.emote == "lick" or v.emote == "tickle") then
                 v:Hide()
             end
             if (v.emote == oldEmote) then
                 v:Hide()
-                table.remove(LAT_GUI.buttonFrames, i)
+                table.remove(LAT_GUI.buttonTable, i)
             end
         end
         SetCVar("nameplateShowFriends", 0)
@@ -427,7 +440,7 @@ end
 
 function ZUI_LickAndTickle:SwapBtnPressed(self, button, down)
     LAT_GUI.inputFrame:Hide()
-    for i, v in ipairs(LAT_GUI.buttonFrames) do
+    for i, v in ipairs(LAT_GUI.buttonTable) do
         v:Hide()
     end
     ZUI_LickAndTickle.db.realm.otherText = nil
@@ -442,6 +455,7 @@ function ZUI_LickAndTickle:setEmoteList(emotes)
 end
 
 -- needs better locale support
--- fix placement
+-- fix re-show nameplates not always reseting profile
 
--- fix LAT_GUI.buttonframes duplicate values
+-- fix LAT_GUI.buttonTable duplicate values
+-- fix icon on highlight clipping
