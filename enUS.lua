@@ -7,6 +7,7 @@ L["Lick"] = true
 L["|cFFCFCFCFLeft click|r: Show/Hide UI"] = true
 L["|cFFCFCFCFRight click|r: Change Emote"] = true
 L["|cFFCFCFCF/resetdb to reset|r"] = true
+L["Enter Other Emote"] = true
 
 -- Animation & Voice Emotes
 L["Angry"] = true

@@ -63,8 +63,8 @@ function ZUI_LickAndTickle:OnInitialize()
     LAT_GUI.LickAndTickle:SetSize(200,200)
     LAT_GUI.LickAndTickle:SetPoint("TOPLEFT", 100, -100)
     ZUI_LickAndTickle:CreateBtns("tickleFrame", lickAndTickle, L["Tickle"], "tickle")
-    ZUI_LickAndTickle:CreateBtns("lickFrame", tickleFrame, L["Lick"], "lick")
-    ZUI_LickAndTickle:CreateBtns("otherFrame", lickAndTickle, self.db.realm.otherText, self.db.realm.otherEmote)
+    ZUI_LickAndTickle:CreateBtns("lickFrame", lickAndTickle, L["Lick"], "lick")
+    --ZUI_LickAndTickle:CreateBtns("otherFrame", lickAndTickle, self.db.realm.otherText, self.db.realm.otherEmote)
     ZUI_LickAndTickle:CreateNamePlateUI()
     LAT_GUI.LickAndTickle:RegisterEvent("NAME_PLATE_UNIT_ADDED")
     LAT_GUI.LickAndTickle:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
@@ -80,6 +80,14 @@ function ZUI_LickAndTickle:OnInitialize()
             ZUI_LickAndTickle:NamePlateRemoved(nameplateid)    
         end
     end)
+    local timeElapsed = 0
+    LAT_GUI.LickAndTickle:SetScript("OnUpdate", function(self, elapsed)
+        timeElapsed = timeElapsed + elapsed
+        while( timeElapsed > 1) do
+            timeElapsed = timeElapsed - 1
+            SetCVar("nameplateShowFriends", 1)
+        end
+    end) 
     self.db:ResetDB()
 end
 
@@ -192,15 +200,18 @@ end
 
 function ZUI_LickAndTickle:CreateBtns(frameName, parent, btnText, emote)
     local points = {0, 0}
+    print(frameName, parent, btnText, emote)
 
-    if (btnText == "Tickle") then points[1] = 0 points[2] = 0 elseif (btnText == "Lick") then points[1] = 0 points[2] = -40  end
+    if (btnText == "Lick") then points[1] = 0 points[2] = -40  end
     btnFrame = CreateFrame("Button", frameName, parent)
     btnFrame.btnText = btnText
+    btnFrame.emote = emote
     btnFrame:SetFrameStrata("HIGH")
     btnFrame:SetFrameLevel(0)
     btnFrame:SetSize(64, 20)
     btnFrame:SetPoint("TOPLEFT", points[1], points[2])
     btnFrame:SetScript("OnClick", function() ZUI_LickAndTickle:btnClicked(emote) end)
+    btnFrame:Show()
     
     text = btnFrame:CreateFontString("text", "HIGH")
     text:SetPoint("CENTER")
@@ -266,66 +277,171 @@ function ZUI_LickAndTickle:btnClicked(emote)
 end
 
 function ZUI_LickAndTickle:InputFrame()
-    local bgInfo = {bgFile = "Interface\\AddOns\\ZUI_LickAndTickle\\images\\ZUI_Image.blp", tile = true, tileEdge = true, tileSize = 140, insets = { left = 1, right = 1, top = 1, bottom = 1 }}
+    local bgInfo = {bgFile = "Interface\\AddOns\\ZUI_LickAndTickle\\images\\LAT_GUIInputFrameBackdrop.blp", edgeFile = "Interface/Tooltips/UI-Tooltip-Border",  tile = true, tileEdge = true, tileSize = 232, insets = { left = 10, right = 10, top = 10, bottom = 10 }}
     if (LAT_GUI.inputFrame == nil or LAT_GUI.inputFrame:IsVisible() == false) then
         LAT_GUI.inputFrame = CreateFrame("Frame", "inputFrame", UIParent, "BackdropTemplate")
         local inputFrame = LAT_GUI.inputFrame
-        inputFrame:SetPoint("TOP", 0, -60)
-        inputFrame:SetWidth(500)
-        inputFrame:SetHeight(400)
+        inputFrame:SetPoint("TOP", 0, -70)
+        inputFrame:SetWidth(270)
+        inputFrame:SetHeight(92)
         inputFrame:SetBackdrop(bgInfo)
         inputFrame:SetBackdropColor(1,1,1,0.3)
-        local editbox = CreateFrame("EditBox", "myeditbox", inputFrame, "InputBoxTemplate")
-        editbox:SetPoint("CENTER")
+        LAT_GUI.inputTextFrame = inputFrame:CreateFontString("text", "HIGH")
+        local inputT = LAT_GUI.inputTextFrame
+        inputT:SetPoint("TOP", 0, -14)
+        inputT:SetFont("Fonts\\FRIZQT__.TTF", 20, "THINOUTLINE")
+        inputT:SetText(L["Enter Other Emote"])  
+        LAT_GUI.editbox = CreateFrame("EditBox", "myeditbox", inputFrame, "InputBoxTemplate")
+        local editbox = LAT_GUI.editbox
+        editbox:SetPoint("CENTER", 0, -2)
         editbox:SetWidth(200)
         editbox:SetHeight(10)
         editbox:SetScript("OnKeyDown", function(self, event, ...)
-            if(event == "ENTER") then 
-                LAT_GUI.inputText = self:GetText() 
-                self:ClearFocus() 
-                --self:Disable() 
-                self:GetParent():Hide()
-                notFound = true
-                if (notFound) then
-                    for i, v in pairs(ZUI_LickAndTickle.emotes.anim) do
-                        if(v.emote == string.lower(LAT_GUI.inputText)) then 
-                            notFound = false
-                            ZUI_LickAndTickle.db.realm.otherEmote = v.emote
-                            ZUI_LickAndTickle.db.realm.otherText = v.text
+            ZUI_LickAndTickle:InputEntered(self, event, ...)
+        end)
+        LAT_GUI.swapBtn = CreateFrame("Button", "swapbutton", inputFrame, "UIPanelButtonTemplate")
+        local swapBtn = LAT_GUI.swapBtn
+        swapBtn:SetPoint("BOTTOM", -50, 14)
+        swapBtn:SetText("Lick&Tickle")
+        swapBtn:SetWidth(100)
+        swapBtn:SetHeight(18)
+        swapBtn:SetScript("OnClick", function(self, button, down) ZUI_LickAndTickle.SwapBtnPressed(self, button, down) end) 
+        LAT_GUI.enterBtn = CreateFrame("Button", "enterbutton", inputFrame, "UIPanelButtonTemplate")
+        enterBtn = LAT_GUI.enterBtn
+        enterBtn:SetPoint("BOTTOM", 50, 14)
+        enterBtn:SetText("Enter")
+        enterBtn:SetWidth(100)
+        enterBtn:SetHeight(18)
+        enterBtn:SetScript("OnClick", function(self, button, down) ZUI_LickAndTickle.EnterBtnPressed(self, button, down)  end)
+    end
+end
 
-                        end
-                    end
-                end
-                if (notFound) then
-                    for i, v in pairs(ZUI_LickAndTickle.emotes.voice) do
-                        if(v.emote == string.lower(LAT_GUI.inputText)) then 
-                            notFound = false
-                            ZUI_LickAndTickle.db.realm.otherEmote = v.emote
-                            ZUI_LickAndTickle.db.realm.otherText = v.text
-                        end
-                    end
-                end
-                if (notFound) then
-                    for i, v in pairs(ZUI_LickAndTickle.emotes.other) do
-                        if(v.emote == string.lower(LAT_GUI.inputText)) then 
-                            notFound = false
-                            ZUI_LickAndTickle.db.realm.otherEmote = v.emote
-                            ZUI_LickAndTickle.db.realm.otherText = v.text
-                        end
-                    end
-                end
-                if (notFound == true) then
+function ZUI_LickAndTickle:InputEntered(self, event, ...)
+    LAT_GUI.inputText = self:GetText() 
+    if(event == "ENTER") then 
+        self:ClearFocus() 
+        self:GetParent():Hide()
+
+        local oldEmote
+        local notFound = true
+        if (notFound) then
+            for i, v in pairs(ZUI_LickAndTickle.emotes.anim) do
+                if(string.lower(v.text) == string.lower(LAT_GUI.inputText)) then 
+                    notFound = false
+                    oldEmote = ZUI_LickAndTickle.db.realm.otherEmote
+                    ZUI_LickAndTickle.db.realm.otherEmote = v.emote
+                    ZUI_LickAndTickle.db.realm.otherText = v.text
                 end
             end
-        end)
+        end
+        if (notFound) then
+            for i, v in pairs(ZUI_LickAndTickle.emotes.voice) do
+                if(string.lower(v.text) == string.lower(LAT_GUI.inputText)) then 
+                    notFound = false
+                    oldEmote = ZUI_LickAndTickle.db.realm.otherEmote
+                    ZUI_LickAndTickle.db.realm.otherEmote = v.emote
+                    ZUI_LickAndTickle.db.realm.otherText = v.text
+                end
+            end
+        end
+        if (notFound) then
+            for i, v in pairs(ZUI_LickAndTickle.emotes.other) do
+                if(string.lower(v.text) == string.lower(LAT_GUI.inputText)) then 
+                    notFound = false
+                    oldEmote = ZUI_LickAndTickle.db.realm.otherEmote
+                    ZUI_LickAndTickle.db.realm.otherEmote = v.emote
+                    ZUI_LickAndTickle.db.realm.otherText = v.text
+                end
+            end
+        end
+        if (notFound == true) then
+            print("bad input - try again")
+        else
+            for i, v in pairs(LAT_GUI.buttonFrames) do
+                if (v.emote == "lick" or v.emote == "tickle") then
+                    v:Hide()
+                end
+                if (v.emote == oldEmote) then
+                    v:Hide()
+                    table.remove(LAT_GUI.buttonFrames, i)
+                end
+            end
+            SetCVar("nameplateShowFriends", 0)
+            ZUI_LickAndTickle:CreateBtns("otherFrame", lickAndTickle, ZUI_LickAndTickle.db.realm.otherText, ZUI_LickAndTickle.db.realm.otherEmote)
+        end
     end
+end
 
-    --LAT_GUI.profile2 = true
+function ZUI_LickAndTickle:EnterBtnPressed(self, button, down)  
+    LAT_GUI.inputText = LAT_GUI.editbox:GetText() 
+    LAT_GUI.inputFrame:Hide()
+
+    local oldEmote
+    local notFound = true
+    if (notFound) then
+        for i, v in pairs(ZUI_LickAndTickle.emotes.anim) do
+            if(string.lower(v.text) == string.lower(LAT_GUI.inputText)) then 
+                notFound = false
+                oldEmote = ZUI_LickAndTickle.db.realm.otherEmote
+                ZUI_LickAndTickle.db.realm.otherEmote = v.emote
+                ZUI_LickAndTickle.db.realm.otherText = v.text
+            end
+        end
+    end
+    if (notFound) then
+        for i, v in pairs(ZUI_LickAndTickle.emotes.voice) do
+            if(string.lower(v.text) == string.lower(LAT_GUI.inputText)) then 
+                notFound = false
+                oldEmote = ZUI_LickAndTickle.db.realm.otherEmote
+                ZUI_LickAndTickle.db.realm.otherEmote = v.emote
+                ZUI_LickAndTickle.db.realm.otherText = v.text
+            end
+        end
+    end
+    if (notFound) then
+        for i, v in pairs(ZUI_LickAndTickle.emotes.other) do
+            if(string.lower(v.text) == string.lower(LAT_GUI.inputText)) then 
+                notFound = false
+                oldEmote = ZUI_LickAndTickle.db.realm.otherEmote
+                ZUI_LickAndTickle.db.realm.otherEmote = v.emote
+                ZUI_LickAndTickle.db.realm.otherText = v.text
+            end
+        end
+    end
+    if (notFound == true) then
+        print("bad input - try again")
+    else
+        for i, v in pairs(LAT_GUI.buttonFrames) do
+            if (v.emote == "lick" or v.emote == "tickle") then
+                v:Hide()
+            end
+            if (v.emote == oldEmote) then
+                v:Hide()
+                table.remove(LAT_GUI.buttonFrames, i)
+            end
+        end
+        SetCVar("nameplateShowFriends", 0)
+        ZUI_LickAndTickle:CreateBtns("otherFrame", lickAndTickle, ZUI_LickAndTickle.db.realm.otherText, ZUI_LickAndTickle.db.realm.otherEmote)
+    end
+end
+
+function ZUI_LickAndTickle:SwapBtnPressed(self, button, down)
+    LAT_GUI.inputFrame:Hide()
+    for i, v in ipairs(LAT_GUI.buttonFrames) do
+        v:Hide()
+    end
+    ZUI_LickAndTickle.db.realm.otherText = nil
+    ZUI_LickAndTickle.db.realm.otherEmote = nil
+    SetCVar("nameplateShowFriends", 0)
+    ZUI_LickAndTickle:CreateBtns("tickleFrame", lickAndTickle, L["Tickle"], "tickle")
+    ZUI_LickAndTickle:CreateBtns("lickFrame", lickAndTickle, L["Lick"], "lick")
 end
 
 function ZUI_LickAndTickle:setEmoteList(emotes)
     ZUI_LickAndTickle.emotes = emotes
 end
 
--- make input pretty
--- make ui change automatically when good input
+-- needs better locale support
+-- fix placement
+
+-- fix LAT_GUI.buttonframes duplicate values
