@@ -81,13 +81,7 @@ function ZUI_LickAndTickle:OnInitialize()
         end
     end)
     local timeElapsed = 0
-    LAT_GUI.LickAndTickle:SetScript("OnUpdate", function(self, elapsed)
-        timeElapsed = timeElapsed + elapsed
-        while( timeElapsed > 1) do
-            timeElapsed = timeElapsed - 1
-            SetCVar("nameplateShowFriends", 1)
-        end
-    end) 
+    
     --self.db:ResetDB()
 end
 
@@ -287,6 +281,7 @@ function ZUI_LickAndTickle:btnClicked(emote)
             end
         end
     end
+    
 end
 
 function ZUI_LickAndTickle:InputFrame()
@@ -332,6 +327,7 @@ end
 function ZUI_LickAndTickle:InputEntered(self, event, ...)
     LAT_GUI.inputText = self:GetText() 
     if(event == "ENTER") then 
+        ZUI_LickAndTickle:ReShowNameplates()
         self:ClearFocus() 
         self:GetParent():Hide()
 
@@ -386,6 +382,7 @@ function ZUI_LickAndTickle:InputEntered(self, event, ...)
 end
 
 function ZUI_LickAndTickle:EnterBtnPressed(self, button, down)  
+    ZUI_LickAndTickle:ReShowNameplates()
     LAT_GUI.inputText = LAT_GUI.editbox:GetText() 
     LAT_GUI.inputFrame:Hide()
 
@@ -440,6 +437,7 @@ end
 
 function ZUI_LickAndTickle:SwapBtnPressed(self, button, down)
     LAT_GUI.inputFrame:Hide()
+    ZUI_LickAndTickle:ReShowNameplates()
     for i, v in ipairs(LAT_GUI.buttonTable) do
         v:Hide()
     end
@@ -455,6 +453,8 @@ function ZUI_LickAndTickle:setEmoteList(emotes)
 end
 
 -- needs better locale support
--- fix re-show nameplates not always reseting profile
-
 -- fix LAT_GUI.buttonTable duplicate values
+
+function ZUI_LickAndTickle:ReShowNameplates()
+	C_Timer.After(0.3, function() SetCVar("nameplateShowFriends", 1)  end)
+end
