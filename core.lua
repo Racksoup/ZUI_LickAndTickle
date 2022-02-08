@@ -67,7 +67,11 @@ function ZUI_LickAndTickle:OnInitialize()
     LAT_GUI.LickAndTickle:SetMovable(true)
     LAT_GUI.LickAndTickle:EnableMouse(true)
     LAT_GUI.LickAndTickle:RegisterForDrag("LeftButton")
-    LAT_GUI.LickAndTickle:SetScript("OnDragStart", LAT_GUI.LickAndTickle.StartMoving)
+    LAT_GUI.LickAndTickle:SetScript("OnDragStart", function()
+        if(IsShiftKeyDown() == true)then 
+            LAT_GUI.LickAndTickle:StartMoving()
+        end
+    end)
     LAT_GUI.LickAndTickle:SetScript("OnDragStop", LAT_GUI.LickAndTickle.StopMovingOrSizing)
     ZUI_LickAndTickle:CreateBtns("tickleFrame", lickAndTickle, L["Tickle"], "tickle")
     ZUI_LickAndTickle:CreateBtns("lickFrame", lickAndTickle, L["Lick"], "lick")
