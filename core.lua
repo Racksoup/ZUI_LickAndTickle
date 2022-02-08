@@ -122,11 +122,6 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
             end
         end
     end
-
-    -- print --
-    for i, v in ipairs(LAT_GUI.buttonTable) do
-        print(i, "==", v)
-    end
     
     local unitname = UnitName(nameplateid)
     local unitGuid = UnitGUID(nameplateid)
@@ -465,3 +460,4 @@ end
 
 -- needs better locale support
 -- fix LAT_GUI.buttonTable duplicate values
+-- make buttonframe moveable
