@@ -106,10 +106,11 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
     if (ZUI_LickAndTickle.db.realm.otherEmote) then
         LAT_GUI.profile2 = true
         for i, v in pairs(LAT_GUI.buttonTable) do
-            if (v.btnText == "Lick" or v.btnText == "Tickle") then
-               v:Hide() 
+            if (v.btnText == ZUI_LickAndTickle.db.realm.otherText) then
+               v:Show()
             else
-                v:Show()
+                v:Hide()
+               table.remove(LAT_GUI.buttonTable, i) 
             end
         end
     else
@@ -117,8 +118,14 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
         for i, v in pairs(LAT_GUI.buttonTable) do
             if (v.btnText ~= "Lick" and v.btnText ~= "Tickle") then
                 v:Hide() 
+                table.remove(LAT_GUI.buttonTable, i)
             end
         end
+    end
+
+    -- print --
+    for i, v in ipairs(LAT_GUI.buttonTable) do
+        print(i, "==", v)
     end
     
     local unitname = UnitName(nameplateid)
@@ -452,9 +459,9 @@ function ZUI_LickAndTickle:setEmoteList(emotes)
     ZUI_LickAndTickle.emotes = emotes
 end
 
--- needs better locale support
--- fix LAT_GUI.buttonTable duplicate values
-
 function ZUI_LickAndTickle:ReShowNameplates()
 	C_Timer.After(0.3, function() SetCVar("nameplateShowFriends", 1)  end)
 end
+
+-- needs better locale support
+-- fix LAT_GUI.buttonTable duplicate values
