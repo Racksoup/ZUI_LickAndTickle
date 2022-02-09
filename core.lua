@@ -482,3 +482,4 @@ end
 -- needs more comments
 -- hide display on entering the game
 -- make both realm based or profile based
+-- make keybind for emote
