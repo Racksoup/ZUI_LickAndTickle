@@ -123,19 +123,21 @@ function ZUI_LickAndTickle:OnDisable()
 end
 
 function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
-    for i, v in ipairs(LAT_GUI.iconTable) do
-        if (nameplateid == v.nameplateid) then v:Hide() end
-    end
+    -- hides any old icons
+    -- for i, v in ipairs(LAT_GUI.iconTable) do
+    --     if (nameplateid == v.nameplateid) then v:Hide() end
+    -- end
+
+    -- if the user has selected a custom emote. set profile2 true. hide and remove lick and tickle buttons
     if (ZUI_LickAndTickle.db.realm.otherEmote) then
         LAT_GUI.profile2 = true
         for i, v in pairs(LAT_GUI.buttonTable) do
-            if (v.btnText == ZUI_LickAndTickle.db.realm.otherText) then
-               v:Show()
-            else
+            if (v.btnText ~= ZUI_LickAndTickle.db.realm.otherText) then
                 v:Hide()
                table.remove(LAT_GUI.buttonTable, i) 
             end
         end
+    -- if the user hasent selected a custom emote. set profile2 false. hide and remove wrong buttons
     else
         LAT_GUI.profile2 = false
         for i, v in pairs(LAT_GUI.buttonTable) do
@@ -151,6 +153,7 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
     local isPlaterAddon = false
     local namePlate
     if (C_NamePlate.GetNamePlateForUnit(nameplateid).unitFrame) then
+        -- plater uses lowercase 'u' for their unitFrame
         namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).unitFrame
         isPlaterAddon = true
     else
@@ -158,11 +161,14 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
         isPlaterAddon = false
     end
     local locClass, engClass, locRace, engRace, gender, name, server = GetPlayerInfoByGUID(unitGuid)
+    local faction
     local inLickDB = false
     local inTickleDB = false
     local inOtherDB = false
     local inEitherDB = true
-    
+
+    -- check if player is same faction as new nameplate unit
+    if (UnitFactionGroup(nameplateid) == UnitFactionGroup("Player")) then
     namePlate:Show()
 
     if(LAT_GUI.profile2 == true) then inLickDB = true inTickleDB = true end
@@ -187,6 +193,7 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
     elseif (inEitherDB == true and inTickleDB == false and locClass) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
     elseif (LAT_GUI.profile2 == true and inOtherDB == false and locClass) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
     end
+end
 end
 
 function ZUI_LickAndTickle:NamePlateRemoved(nameplateid)
@@ -492,7 +499,6 @@ end
 -- reset pos config
 -- might be showing icons on enemies
 -- needs more comments
--- hide display on entering the game
 -- make both realm based or profile based
 -- make keybind for emote
 -- default profile set to wave, input profile, then profile for lick and tickle
