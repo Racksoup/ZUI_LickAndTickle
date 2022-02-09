@@ -478,3 +478,7 @@ end
 -- track emotes without using buttons
 -- track all emotes other than just selected emotes
 -- reset pos config
+-- might be showing icons on enemies
+-- needs more comments
+-- hide display on entering the game
+-- make both realm based or profile based
