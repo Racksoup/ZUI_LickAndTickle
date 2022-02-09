@@ -10,8 +10,10 @@ local ZUI_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("ZUI_LickAndTickle", 
             ZUI_LickAndTickle:InputFrame()
         end
         if (button == "LeftButton" and LAT_GUI.LickAndTickle:IsVisible()) then
+            ZUI_LickAndTickle.db.profile.showOnFirstLoad = false
             ZUI_LickAndTickle:OnDisable();
         elseif(button == "LeftButton") then
+            ZUI_LickAndTickle.db.profile.showOnFirstLoad = true
             ZUI_LickAndTickle:OnEnable();
             SetCVar("nameplateShowFriends", 1)
         end
@@ -43,6 +45,9 @@ local defaults = {
         tickled = {},
         other = {},
     },
+    profile = {
+        showOnFirstLoad = false,
+    },
 }
 
 SLASH_RESETDB1 = "/lat-reset"
@@ -59,6 +64,7 @@ function ZUI_LickAndTickle:OnInitialize()
     LAT_GUI.buttonTable = {}
     LAT_GUI.iconTable = {}
     LAT_GUI.plateTable = {}
+    ZUI_LickAndTickle.firstLoad = true
     self.db = LibStub("AceDB-3.0"):New("ZUI_LickAndTickleDB", defaults, true)
     icon:Register("ZUI_LickAndTickle", ZUI_LDB, self.db.realm.minimap)
     LAT_GUI.LickAndTickle = CreateFrame("Frame", "lickAndTickle", UIParent)
@@ -99,6 +105,12 @@ function ZUI_LickAndTickle:OnEnable()
             ZUI_LickAndTickle:NamePlateRemoved(nameplateid)    
         end
     end)
+
+    if (ZUI_LickAndTickle.db.profile.showOnFirstLoad == false and ZUI_LickAndTickle.firstLoad == true) then
+        print("hit")
+        ZUI_LickAndTickle:OnDisable()
+    end
+    ZUI_LickAndTickle.firstLoad = false
 end
 
 function ZUI_LickAndTickle:OnDisable()
