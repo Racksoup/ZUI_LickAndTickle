@@ -473,3 +473,8 @@ end
 
 -- needs better locale support
 -- needs cleaning
+-- add lick and tickle button together
+-- add config window
+-- track emotes without using buttons
+-- track all emotes other than just selected emotes
+-- reset pos config
