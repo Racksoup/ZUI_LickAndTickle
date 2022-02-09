@@ -483,3 +483,5 @@ end
 -- hide display on entering the game
 -- make both realm based or profile based
 -- make keybind for emote
+-- default profile set to wave, input profile, then profile for lick and tickle
+-- hide buttons without hiding display
