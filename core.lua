@@ -35,8 +35,8 @@ local options = {
     handler = ZUI_LickAndTickle,
     type = 'group',
     args = {
-
-    },
+        
+    }
 }
 
 local defaults = {
@@ -69,6 +69,9 @@ function ZUI_LickAndTickle:OnInitialize()
     ZUI_LickAndTickle.firstLoad = true
     self.db = LibStub("AceDB-3.0"):New("ZUI_LickAndTickleDB", defaults, true)
     icon:Register("ZUI_LickAndTickle", ZUI_LDB, self.db.realm.minimap)
+
+    -- make interface options 
+    ZUI_LickAndTickle:CreateInterfaceOptions()
 
     -- make button frame
     LAT_GUI.ButtonFrame = CreateFrame("Frame", "lickAndTickle", UIParent)
@@ -131,6 +134,22 @@ function ZUI_LickAndTickle:OnDisable()
     -- Unregisters NamePlateAdded and NamePlateRemoved
     LAT_GUI.ButtonFrame:UnregisterEvent("NAME_PLATE_UNIT_ADDED")
     LAT_GUI.ButtonFrame:UnregisterEvent("NAME_PLATE_UNIT_REMOVED")
+end
+
+function ZUI_LickAndTickle:CreateInterfaceOptions()
+    local panel = CreateFrame("Frame")
+    panel.name = "ZUI Friendly Emote Tracker"               
+    InterfaceOptions_AddCategory(panel) 
+
+    local button = CreateFrame("Button", "JOhnDCEN", panel, "UIPanelButtonTemplate")
+    button:SetPoint("CENTER")
+    button:SetSize(200,200)
+    button:SetText("Hello World!")
+
+    -- add widgets to the panel as desired
+    local title = panel:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
+    title:SetPoint("TOP")
+    title:SetText("MyAddOn")
 end
 
 function ZUI_LickAndTickle:CreateBtns(frameName, parent, btnText, emote)
@@ -464,7 +483,6 @@ end
 
 -- needs better locale support
 -- add lick and tickle button together
--- add config window
 -- track emotes without using buttons
 -- track all emotes other than just selected emotes
 -- reset pos config
@@ -473,3 +491,4 @@ end
 -- default profile set to wave, input profile, then profile for lick and tickle
 -- hide buttons without hiding icons
 -- change addon name
+-- open options from minimap
