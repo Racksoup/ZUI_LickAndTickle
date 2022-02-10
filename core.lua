@@ -136,6 +136,12 @@ function ZUI_LickAndTickle:OnDisable()
     LAT_GUI.ButtonFrame:UnregisterEvent("NAME_PLATE_UNIT_REMOVED")
 end
 
+function ZUI_LickAndTickle:HideAllEmoteButtons()
+    for i, v in pairs(LAT_GUI.buttonTable) do
+        v:Hide()
+    end
+end
+
 function ZUI_LickAndTickle:CreateInterfaceOptions()
     local panel = CreateFrame("Frame")
     panel.name = "Friendly Emote Tracker"               
@@ -144,15 +150,22 @@ function ZUI_LickAndTickle:CreateInterfaceOptions()
     title:SetPoint("TOP", 0, -8)
     title:SetText("ZUI Friendly Emote Tracker")
 
-    ZUI_LickAndTickle:CreateInterfaceButton(panel, -50, "Hide", "Hide Emote Buttons")
-    ZUI_LickAndTickle:CreateInterfaceButton(panel, -80, "Hello World", "DO SOMETHING")
+    local hideEmoteButtonsFunc = function() ZUI_LickAndTickle:HideAllEmoteButtons() end
+    local showEmoteButtonsFunc = function() ZUI_LickAndTickle:HideDisabledProfileButtons() end
+
+    ZUI_LickAndTickle:CreateInterfaceButton(panel, -50, "Hide", "Hide Emote Buttons", hideEmoteButtonsFunc)
+    ZUI_LickAndTickle:CreateInterfaceButton(panel, -80, "Show", "Show Emote Buttons", showEmoteButtonsFunc)
+    ZUI_LickAndTickle:CreateInterfaceButton(panel, -110, "Lick And Tickle", "something else")
 end
 
-function ZUI_LickAndTickle:CreateInterfaceButton(panel, yCord, buttonText, labelText)
+
+
+function ZUI_LickAndTickle:CreateInterfaceButton(panel, yCord, buttonText, labelText, buttonFunc)
     local button = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
     button:SetPoint("TOPLEFT", 320, yCord)
     button:SetSize(200, 25)
     button:SetText(buttonText)
+    button:SetScript("OnClick", function() buttonFunc() end)
     local label = button:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
     label:SetPoint("CENTER", -298, 0)
     label:SetText(labelText)
@@ -458,6 +471,8 @@ function ZUI_LickAndTickle:HideDisabledProfileButtons()
             if (v.btnText ~= ZUI_LickAndTickle.db.realm.otherText) then
                 v:Hide()
                 table.remove(LAT_GUI.buttonTable, i) 
+            else
+                v:Show()
             end
         end
 
@@ -468,6 +483,8 @@ function ZUI_LickAndTickle:HideDisabledProfileButtons()
             if (v.btnText ~= "Lick" and v.btnText ~= "Tickle") then
                 v:Hide() 
                 table.remove(LAT_GUI.buttonTable, i)
+            else
+                v:Show()
             end
         end
     end
