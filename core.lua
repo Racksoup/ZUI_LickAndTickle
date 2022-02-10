@@ -528,10 +528,10 @@ function ZUI_LickAndTickle:CheckForPlater(nameplateid)
 end
 
 -- needs better locale support
--- add lick and tickle button together
--- track all emotes other than just selected emotes
--- make both realm based or profile based
--- make keybind for emote
 -- see if the addon NEEDs ACE3
 -- redesign inputframe backdrop
+-- make both realm based or profile based - interface option
+-- make keybind for emote - inteface option
 -- switch to profile2 (open input window) - interface option
+-- add lick and tickle button together - interface option
+-- infotext in - interface
