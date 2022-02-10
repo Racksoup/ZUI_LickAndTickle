@@ -138,18 +138,24 @@ end
 
 function ZUI_LickAndTickle:CreateInterfaceOptions()
     local panel = CreateFrame("Frame")
-    panel.name = "ZUI Friendly Emote Tracker"               
+    panel.name = "Friendly Emote Tracker"               
     InterfaceOptions_AddCategory(panel) 
-
-    local button = CreateFrame("Button", "JOhnDCEN", panel, "UIPanelButtonTemplate")
-    button:SetPoint("CENTER")
-    button:SetSize(200,200)
-    button:SetText("Hello World!")
-
-    -- add widgets to the panel as desired
     local title = panel:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
-    title:SetPoint("TOP")
-    title:SetText("MyAddOn")
+    title:SetPoint("TOP", 0, -8)
+    title:SetText("ZUI Friendly Emote Tracker")
+
+    ZUI_LickAndTickle:CreateInterfaceButton(panel, -50, "Hide", "Hide Emote Buttons")
+    ZUI_LickAndTickle:CreateInterfaceButton(panel, -80, "Hello World", "DO SOMETHING")
+end
+
+function ZUI_LickAndTickle:CreateInterfaceButton(panel, yCord, buttonText, labelText)
+    local button = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+    button:SetPoint("TOPLEFT", 320, yCord)
+    button:SetSize(200, 25)
+    button:SetText(buttonText)
+    local label = button:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
+    label:SetPoint("CENTER", -298, 0)
+    label:SetText(labelText)
 end
 
 function ZUI_LickAndTickle:CreateBtns(frameName, parent, btnText, emote)
@@ -492,3 +498,4 @@ end
 -- hide buttons without hiding icons
 -- change addon name
 -- open options from minimap
+-- see if the addon NEEDs ACE3
