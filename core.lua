@@ -109,16 +109,17 @@ function ZUI_LickAndTickle:OnEnable()
     for i,item in ipairs(LAT_GUI.iconTable) do
         item:Show()
     end
-
+    -- Registers NamePlateAdded and NamePlateRemoved
     LAT_GUI.ButtonFrame:RegisterEvent("NAME_PLATE_UNIT_ADDED")
     LAT_GUI.ButtonFrame:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
-    
 
+    -- if first load, check if it should show UI on the first load
     if (ZUI_LickAndTickle.db.profile.showOnFirstLoad == false and ZUI_LickAndTickle.firstLoad == 1) then
-        print("hit")
         ZUI_LickAndTickle:OnDisable()
     end
     ZUI_LickAndTickle.firstLoad = false
+
+    -- Hides the wrong profiles buttons
     ZUI_LickAndTickle:HideDisabledProfileButtons()
 end
 
@@ -128,6 +129,7 @@ function ZUI_LickAndTickle:OnDisable()
     for i,item in ipairs(LAT_GUI.iconTable) do
         item:Hide()
     end
+    -- Unregisters NamePlateAdded and NamePlateRemoved
     LAT_GUI.ButtonFrame:UnregisterEvent("NAME_PLATE_UNIT_ADDED")
     LAT_GUI.ButtonFrame:UnregisterEvent("NAME_PLATE_UNIT_REMOVED")
 end
