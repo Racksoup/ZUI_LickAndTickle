@@ -10,11 +10,9 @@ local ZUI_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("ZUI_LickAndTickle", 
         if (button == "RightButton") then
             ZUI_LickAndTickle:InputFrame()
         end
-        if (button == "LeftButton" and LAT_GUI.LickAndTickle:IsVisible() and IsShiftKeyDown()) then
-            print("hit")
+        if (button == "LeftButton" and LAT_GUI.ButtonFrame:IsVisible() and IsShiftKeyDown()) then
             SetCVar("nameplateShowFriends", 0)
-        
-        elseif (button == "LeftButton" and LAT_GUI.LickAndTickle:IsVisible()) then
+        elseif (button == "LeftButton" and LAT_GUI.ButtonFrame:IsVisible()) then
             ZUI_LickAndTickle.db.profile.showOnFirstLoad = false
             ZUI_LickAndTickle:OnDisable();
         
@@ -74,32 +72,16 @@ function ZUI_LickAndTickle:OnInitialize()
     icon:Register("ZUI_LickAndTickle", ZUI_LDB, self.db.realm.minimap)
 
     -- make button frame
-    LAT_GUI.LickAndTickle = CreateFrame("Frame", "lickAndTickle", UIParent)
-    LAT_GUI.LickAndTickle:SetSize(80,80)
-    LAT_GUI.LickAndTickle:SetPoint("TOPLEFT", 80, -80)
-    LAT_GUI.LickAndTickle:SetMovable(true)
-    LAT_GUI.LickAndTickle:EnableMouse(true)
-    LAT_GUI.LickAndTickle:RegisterForDrag("LeftButton")
-    LAT_GUI.LickAndTickle:SetScript("OnDragStart", function() if(IsShiftKeyDown() == true) then LAT_GUI.LickAndTickle:StartMoving() end end)
-    LAT_GUI.LickAndTickle:SetScript("OnDragStop", LAT_GUI.LickAndTickle.StopMovingOrSizing)
-    
-    -- make buttons
-    if (self.db.realm.otherEmote) then 
-        ZUI_LickAndTickle:CreateBtns("otherFrame", lickAndTickle, self.db.realm.otherText, self.db.realm.otherEmote)
-    else
-        ZUI_LickAndTickle:CreateBtns("tickleFrame", lickAndTickle, L["Tickle"], "tickle")
-        ZUI_LickAndTickle:CreateBtns("lickFrame", lickAndTickle, L["Lick"], "lick")
-    end
-end
-
-function ZUI_LickAndTickle:OnEnable()
-    LAT_GUI.LickAndTickle:Show()
-    for i,item in ipairs(LAT_GUI.iconTable) do
-        item:Show()
-    end
-    LAT_GUI.LickAndTickle:RegisterEvent("NAME_PLATE_UNIT_ADDED")
-    LAT_GUI.LickAndTickle:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
-    LAT_GUI.LickAndTickle:SetScript("OnEvent", function(self, event, ...)
+    LAT_GUI.ButtonFrame = CreateFrame("Frame", "lickAndTickle", UIParent)
+    LAT_GUI.ButtonFrame:SetSize(80,80)
+    LAT_GUI.ButtonFrame:SetPoint("TOPLEFT", 80, -80)
+    LAT_GUI.ButtonFrame:SetMovable(true)
+    LAT_GUI.ButtonFrame:EnableMouse(true)
+    LAT_GUI.ButtonFrame:RegisterForDrag("LeftButton")
+    LAT_GUI.ButtonFrame:SetScript("OnDragStart", function() if(IsShiftKeyDown() == true) then LAT_GUI.ButtonFrame:StartMoving() end end)
+    LAT_GUI.ButtonFrame:SetScript("OnDragStop", LAT_GUI.ButtonFrame.StopMovingOrSizing)
+    -- Calls NamePlateAdded() or NamePlateRemoved()
+    LAT_GUI.ButtonFrame:SetScript("OnEvent", function(self, event, ...)
         if (event == "NAME_PLATE_UNIT_ADDED") then
             local nameplateid = ...
             if (UnitGUID(nameplateid) ~= UnitGUID("Player"))then
@@ -111,6 +93,26 @@ function ZUI_LickAndTickle:OnEnable()
             ZUI_LickAndTickle:NamePlateRemoved(nameplateid)    
         end
     end)
+    
+    -- make buttons
+    if (self.db.realm.otherEmote) then 
+        ZUI_LickAndTickle:CreateBtns("otherFrame", lickAndTickle, self.db.realm.otherText, self.db.realm.otherEmote)
+    else
+        ZUI_LickAndTickle:CreateBtns("tickleFrame", lickAndTickle, L["Tickle"], "tickle")
+        ZUI_LickAndTickle:CreateBtns("lickFrame", lickAndTickle, L["Lick"], "lick")
+    end
+end
+
+function ZUI_LickAndTickle:OnEnable()
+    -- Show UI
+    LAT_GUI.ButtonFrame:Show()
+    for i,item in ipairs(LAT_GUI.iconTable) do
+        item:Show()
+    end
+
+    LAT_GUI.ButtonFrame:RegisterEvent("NAME_PLATE_UNIT_ADDED")
+    LAT_GUI.ButtonFrame:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
+    
 
     if (ZUI_LickAndTickle.db.profile.showOnFirstLoad == false and ZUI_LickAndTickle.firstLoad == 1) then
         print("hit")
@@ -121,12 +123,13 @@ function ZUI_LickAndTickle:OnEnable()
 end
 
 function ZUI_LickAndTickle:OnDisable()
-    LAT_GUI.LickAndTickle:Hide()
+    -- Hide UI
+    LAT_GUI.ButtonFrame:Hide()
     for i,item in ipairs(LAT_GUI.iconTable) do
         item:Hide()
     end
-    LAT_GUI.LickAndTickle:UnregisterEvent("NAME_PLATE_UNIT_ADDED")
-    LAT_GUI.LickAndTickle:UnregisterEvent("NAME_PLATE_UNIT_REMOVED")
+    LAT_GUI.ButtonFrame:UnregisterEvent("NAME_PLATE_UNIT_ADDED")
+    LAT_GUI.ButtonFrame:UnregisterEvent("NAME_PLATE_UNIT_REMOVED")
 end
 
 function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
@@ -189,6 +192,7 @@ function ZUI_LickAndTickle:CreateSingleIcon(bgFile, namePlate, nameplateid, unit
         insets = { left = 0, right = 0, top = 0, bottom = 0 },
     }
 
+    -- have to parent to namePlate, cant parent to LAT_GUI table. need to insert into table later
     local frame = CreateFrame("Frame", nil, namePlate, "BackdropTemplate")
     frame.unitname = unitname
     frame.nameplateid = nameplateid
