@@ -122,7 +122,7 @@ function ZUI_LickAndTickle:OnEnable()
     ZUI_LickAndTickle.firstLoad = false
 
     -- Hides the wrong profiles buttons
-    ZUI_LickAndTickle:HideDisabledProfileButtons()
+    ZUI_LickAndTickle:ToggleProfileAndEmoteButtons()
 end
 
 function ZUI_LickAndTickle:OnDisable()
@@ -151,14 +151,18 @@ function ZUI_LickAndTickle:CreateInterfaceOptions()
     title:SetText("ZUI Friendly Emote Tracker")
 
     local hideEmoteButtonsFunc = function() ZUI_LickAndTickle:HideAllEmoteButtons() end
-    local showEmoteButtonsFunc = function() ZUI_LickAndTickle:HideDisabledProfileButtons() end
+    local showEmoteButtonsFunc = function() ZUI_LickAndTickle:ToggleProfileAndEmoteButtons() end
+    local resetEmoteButtonsPos = function() ZUI_LickAndTickle:ResetEmoteButtonsPos() end
 
     ZUI_LickAndTickle:CreateInterfaceButton(panel, -50, "Hide", "Hide Emote Buttons", hideEmoteButtonsFunc)
     ZUI_LickAndTickle:CreateInterfaceButton(panel, -80, "Show", "Show Emote Buttons", showEmoteButtonsFunc)
-    ZUI_LickAndTickle:CreateInterfaceButton(panel, -110, "Lick And Tickle", "something else")
+    ZUI_LickAndTickle:CreateInterfaceButton(panel, -110, "Reset", "Reset Emote Buttons Position", resetEmoteButtonsPos)
 end
 
-
+function ZUI_LickAndTickle:ResetEmoteButtonsPos()
+    LAT_GUI.ButtonFrame:ClearAllPoints()
+    LAT_GUI.ButtonFrame:SetPoint("TOPLEFT", 80, -80)
+end
 
 function ZUI_LickAndTickle:CreateInterfaceButton(panel, yCord, buttonText, labelText, buttonFunc)
     local button = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
@@ -274,7 +278,7 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
     local isPlaterAddon, namePlate = ZUI_LickAndTickle:CheckForPlater(nameplateid) -- Gets nameplate
 
     -- Hides the wrong profiles buttons
-    ZUI_LickAndTickle:HideDisabledProfileButtons()
+    ZUI_LickAndTickle:ToggleProfileAndEmoteButtons()
 
     -- check if player is same faction as new nameplate unit
     if (UnitFactionGroup(nameplateid) == UnitFactionGroup("Player")) then
@@ -445,7 +449,7 @@ end
 function ZUI_LickAndTickle:SwapBtnPressed(self, button, down)
     LAT_GUI.inputFrame:Hide()
     ZUI_LickAndTickle:ReShowNameplates()
-    ZUI_LickAndTickle:HideDisabledProfileButtons()
+    ZUI_LickAndTickle:ToggleProfileAndEmoteButtons()
     ZUI_LickAndTickle.db.realm.otherText = nil
     ZUI_LickAndTickle.db.realm.otherEmote = nil
     
@@ -463,7 +467,7 @@ function ZUI_LickAndTickle:ReShowNameplates()
 	C_Timer.After(0.3, function() SetCVar("nameplateShowFriends", 1)  end)
 end
 
-function ZUI_LickAndTickle:HideDisabledProfileButtons()
+function ZUI_LickAndTickle:ToggleProfileAndEmoteButtons()
     -- if the user has selected a custom emote. set profile2 true. hide and remove lick and tickle buttons
     if (ZUI_LickAndTickle.db.realm.otherEmote) then
         LAT_GUI.profile2 = true
@@ -508,11 +512,9 @@ end
 -- add lick and tickle button together
 -- track emotes without using buttons
 -- track all emotes other than just selected emotes
--- reset pos config
 -- make both realm based or profile based
 -- make keybind for emote
 -- default profile set to wave, input profile, then profile for lick and tickle
--- hide buttons without hiding icons
 -- change addon name
 -- open options from minimap
 -- see if the addon NEEDs ACE3
