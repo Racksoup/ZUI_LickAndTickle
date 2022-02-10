@@ -407,9 +407,7 @@ end
 function ZUI_LickAndTickle:SwapBtnPressed(self, button, down)
     LAT_GUI.inputFrame:Hide()
     ZUI_LickAndTickle:ReShowNameplates()
-    for i, v in ipairs(LAT_GUI.buttonTable) do
-        v:Hide()
-    end
+    ZUI_LickAndTickle:HideDisabledProfileButtons()
     ZUI_LickAndTickle.db.realm.otherText = nil
     ZUI_LickAndTickle.db.realm.otherEmote = nil
     
