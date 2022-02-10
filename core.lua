@@ -1,6 +1,7 @@
 ZUI_LickAndTickle = LibStub("AceAddon-3.0"):NewAddon("ZUI_LickAndTickle", "AceConsole-3.0", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("ZUI_LickAndTickle_Locale")
 local LAT_GUI = LibStub("AceGUI-3.0")
+local icon = LibStub("LibDBIcon-1.0")
 local ZUI_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("ZUI_LickAndTickle", {
     type = "data source",
     text = L["ZUI Lick and Tickle"],
@@ -9,9 +10,14 @@ local ZUI_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("ZUI_LickAndTickle", 
         if (button == "RightButton") then
             ZUI_LickAndTickle:InputFrame()
         end
-        if (button == "LeftButton" and LAT_GUI.LickAndTickle:IsVisible()) then
+        if (button == "LeftButton" and LAT_GUI.LickAndTickle:IsVisible() and IsShiftKeyDown()) then
+            print("hit")
+            SetCVar("nameplateShowFriends", 0)
+        
+        elseif (button == "LeftButton" and LAT_GUI.LickAndTickle:IsVisible()) then
             ZUI_LickAndTickle.db.profile.showOnFirstLoad = false
             ZUI_LickAndTickle:OnDisable();
+        
         elseif(button == "LeftButton") then
             ZUI_LickAndTickle.db.profile.showOnFirstLoad = true
             ZUI_LickAndTickle:OnEnable();
@@ -25,7 +31,6 @@ local ZUI_LDB = LibStub("LibDataBroker-1.1"):NewDataObject("ZUI_LickAndTickle", 
         tooltip:AddLine(L["|cFFCFCFCF/lat-reset or /latre to reset|r"])
     end,
 })
-local icon = LibStub("LibDBIcon-1.0")
 
 local options = {
     name = "ZUI_LickAndTickle",
@@ -61,6 +66,7 @@ SlashCmdList["RESETDB"] = function()
 end 
 
 function ZUI_LickAndTickle:OnInitialize()
+    --self.db:ResetDB() -- to reset for debuging
     LAT_GUI.buttonTable = {}
     LAT_GUI.iconTable = {}
     ZUI_LickAndTickle.firstLoad = true
@@ -84,7 +90,6 @@ function ZUI_LickAndTickle:OnInitialize()
         ZUI_LickAndTickle:CreateBtns("tickleFrame", lickAndTickle, L["Tickle"], "tickle")
         ZUI_LickAndTickle:CreateBtns("lickFrame", lickAndTickle, L["Lick"], "lick")
     end
-    --self.db:ResetDB()
 end
 
 function ZUI_LickAndTickle:OnEnable()
@@ -107,7 +112,7 @@ function ZUI_LickAndTickle:OnEnable()
         end
     end)
 
-    if (ZUI_LickAndTickle.db.profile.showOnFirstLoad == false and ZUI_LickAndTickle.firstLoad == true) then
+    if (ZUI_LickAndTickle.db.profile.showOnFirstLoad == false and ZUI_LickAndTickle.firstLoad == 1) then
         print("hit")
         ZUI_LickAndTickle:OnDisable()
     end
@@ -512,4 +517,3 @@ end
 -- default profile set to wave, input profile, then profile for lick and tickle
 -- hide buttons without hiding display
 -- change addon name
--- stop showing both profiles on startup until a nameplate event triggers
