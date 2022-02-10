@@ -63,26 +63,27 @@ end
 function ZUI_LickAndTickle:OnInitialize()
     LAT_GUI.buttonTable = {}
     LAT_GUI.iconTable = {}
-    LAT_GUI.plateTable = {}
     ZUI_LickAndTickle.firstLoad = true
     self.db = LibStub("AceDB-3.0"):New("ZUI_LickAndTickleDB", defaults, true)
     icon:Register("ZUI_LickAndTickle", ZUI_LDB, self.db.realm.minimap)
+
+    -- make button frame
     LAT_GUI.LickAndTickle = CreateFrame("Frame", "lickAndTickle", UIParent)
     LAT_GUI.LickAndTickle:SetSize(80,80)
     LAT_GUI.LickAndTickle:SetPoint("TOPLEFT", 80, -80)
     LAT_GUI.LickAndTickle:SetMovable(true)
     LAT_GUI.LickAndTickle:EnableMouse(true)
     LAT_GUI.LickAndTickle:RegisterForDrag("LeftButton")
-    LAT_GUI.LickAndTickle:SetScript("OnDragStart", function()
-        if(IsShiftKeyDown() == true)then 
-            LAT_GUI.LickAndTickle:StartMoving()
-        end
-    end)
+    LAT_GUI.LickAndTickle:SetScript("OnDragStart", function() if(IsShiftKeyDown() == true) then LAT_GUI.LickAndTickle:StartMoving() end end)
     LAT_GUI.LickAndTickle:SetScript("OnDragStop", LAT_GUI.LickAndTickle.StopMovingOrSizing)
-    ZUI_LickAndTickle:CreateBtns("tickleFrame", lickAndTickle, L["Tickle"], "tickle")
-    ZUI_LickAndTickle:CreateBtns("lickFrame", lickAndTickle, L["Lick"], "lick")
-    ZUI_LickAndTickle:CreateBtns("otherFrame", lickAndTickle, self.db.realm.otherText, self.db.realm.otherEmote)
-    ZUI_LickAndTickle:CreateNamePlateUI()
+    
+    -- make buttons
+    if (self.db.realm.otherEmote) then 
+        ZUI_LickAndTickle:CreateBtns("otherFrame", lickAndTickle, self.db.realm.otherText, self.db.realm.otherEmote)
+    else
+        ZUI_LickAndTickle:CreateBtns("tickleFrame", lickAndTickle, L["Tickle"], "tickle")
+        ZUI_LickAndTickle:CreateBtns("lickFrame", lickAndTickle, L["Lick"], "lick")
+    end
     --self.db:ResetDB()
 end
 
@@ -111,6 +112,7 @@ function ZUI_LickAndTickle:OnEnable()
         ZUI_LickAndTickle:OnDisable()
     end
     ZUI_LickAndTickle.firstLoad = false
+    ZUI_LickAndTickle:HideDisabledProfileButtons()
 end
 
 function ZUI_LickAndTickle:OnDisable()
@@ -123,77 +125,46 @@ function ZUI_LickAndTickle:OnDisable()
 end
 
 function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
-    -- hides any old icons
-    -- for i, v in ipairs(LAT_GUI.iconTable) do
-    --     if (nameplateid == v.nameplateid) then v:Hide() end
-    -- end
-
-    -- if the user has selected a custom emote. set profile2 true. hide and remove lick and tickle buttons
-    if (ZUI_LickAndTickle.db.realm.otherEmote) then
-        LAT_GUI.profile2 = true
-        for i, v in pairs(LAT_GUI.buttonTable) do
-            if (v.btnText ~= ZUI_LickAndTickle.db.realm.otherText) then
-                v:Hide()
-               table.remove(LAT_GUI.buttonTable, i) 
-            end
-        end
-    -- if the user hasent selected a custom emote. set profile2 false. hide and remove wrong buttons
-    else
-        LAT_GUI.profile2 = false
-        for i, v in pairs(LAT_GUI.buttonTable) do
-            if (v.btnText ~= "Lick" and v.btnText ~= "Tickle") then
-                v:Hide() 
-                table.remove(LAT_GUI.buttonTable, i)
-            end
-        end
-    end
-    
     local unitname = UnitName(nameplateid)
     local unitGuid = UnitGUID(nameplateid)
-    local isPlaterAddon = false
-    local namePlate
-    if (C_NamePlate.GetNamePlateForUnit(nameplateid).unitFrame) then
-        -- plater uses lowercase 'u' for their unitFrame
-        namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).unitFrame
-        isPlaterAddon = true
-    else
-        namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).UnitFrame
-        isPlaterAddon = false
-    end
     local locClass, engClass, locRace, engRace, gender, name, server = GetPlayerInfoByGUID(unitGuid)
     local faction
     local inLickDB = false
     local inTickleDB = false
     local inOtherDB = false
     local inEitherDB = true
+    local isPlaterAddon, namePlate = ZUI_LickAndTickle:CheckForPlater(nameplateid)
+
+    ZUI_LickAndTickle:HideDisabledProfileButtons()
 
     -- check if player is same faction as new nameplate unit
     if (UnitFactionGroup(nameplateid) == UnitFactionGroup("Player")) then
-    namePlate:Show()
+        -- sets profile
+        if(LAT_GUI.profile2 == true) then inLickDB = true inTickleDB = true end
 
-    if(LAT_GUI.profile2 == true) then inLickDB = true inTickleDB = true end
+        -- checks if target's name is in any DB
+        for i, item in ipairs(ZUI_LickAndTickle.db.realm.licked) do
+            if (item == unitname) then inLickDB = true end
+        end
+        for i, item in ipairs(ZUI_LickAndTickle.db.realm.tickled) do
+            if (item == unitname) then inTickleDB = true end
+        end
+        for i, item in ipairs(ZUI_LickAndTickle.db.realm.other) do
+            if (item == unitname) then inOtherDB = true end
+        end
+        if (inLickDB == false and inTickleDB == false) then
+            inEitherDB = false
+        else
+            inEitherDB = true
+        end
 
-    for i, item in ipairs(ZUI_LickAndTickle.db.realm.licked) do
-        if (item == unitname) then inLickDB = true end
+        -- Makes Nameplates
+        if (inEitherDB == false and LAT_GUI.profile2 == false and locClass) then ZUI_LickAndTickle:CreateSingleIcon("Interface\\AddOns\\ZUI_LickAndTickle\\images\\RedBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
+        elseif (inEitherDB == true and inLickDB == false and locClass) then  ZUI_LickAndTickle:CreateSingleIcon("Interface\\AddOns\\ZUI_LickAndTickle\\images\\BlueBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
+        elseif (inEitherDB == true and inTickleDB == false and locClass) then ZUI_LickAndTickle:CreateSingleIcon("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
+        elseif (LAT_GUI.profile2 == true and inOtherDB == false and locClass) then ZUI_LickAndTickle:CreateSingleIcon("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
+        end
     end
-    for i, item in ipairs(ZUI_LickAndTickle.db.realm.tickled) do
-        if (item == unitname) then inTickleDB = true end
-    end
-    for i, item in ipairs(ZUI_LickAndTickle.db.realm.other) do
-        if (item == unitname) then inOtherDB = true end
-    end
-    if (inLickDB == false and inTickleDB == false) then
-        inEitherDB = false
-    else
-        inEitherDB = true
-    end
-
-    if (inEitherDB == false and LAT_GUI.profile2 == false and locClass) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\RedBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
-    elseif (inEitherDB == true and inLickDB == false and locClass) then  ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\BlueBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
-    elseif (inEitherDB == true and inTickleDB == false and locClass) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
-    elseif (LAT_GUI.profile2 == true and inOtherDB == false and locClass) then ZUI_LickAndTickle:CreateNamePlateUI("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
-    end
-end
 end
 
 function ZUI_LickAndTickle:NamePlateRemoved(nameplateid)
@@ -202,7 +173,7 @@ function ZUI_LickAndTickle:NamePlateRemoved(nameplateid)
     end
 end
 
-function ZUI_LickAndTickle:CreateNamePlateUI(bgFile, namePlate, nameplateid, unitGuid, unitname, isPlaterAddon)
+function ZUI_LickAndTickle:CreateSingleIcon(bgFile, namePlate, nameplateid, unitGuid, unitname, isPlaterAddon)
     
     local backdropInfo =
     {
@@ -317,7 +288,7 @@ function ZUI_LickAndTickle:btnClicked(emote)
 end
 
 function ZUI_LickAndTickle:InputFrame()
-    local bgInfo = {bgFile = "Interface\\AddOns\\ZUI_LickAndTickle\\images\\LAT_GUIInputFrameBackdrop.blp", edgeFile = "Interface/Tooltips/UI-Tooltip-Border",  tile = true, tileEdge = true, tileSize = 232, insets = { left = 10, right = 10, top = 10, bottom = 10 }}
+    local bgInfo = {bgFile = "Interface\\AddOns\\ZUI_LickAndTickle\\images\\LAT_GUIInputFrameBackdrop.blp", edgeFile = "Interface/Tooltips/UI-Tooltip-Border",  tile = true, tileEdge = true, tileSize = 252, insets = { left = 10, right = 10, top = 10, bottom = 10 }}
     if (LAT_GUI.inputFrame == nil or LAT_GUI.inputFrame:IsVisible() == false) then
         LAT_GUI.inputFrame = CreateFrame("Frame", "inputFrame", UIParent, "BackdropTemplate")
         local inputFrame = LAT_GUI.inputFrame
@@ -490,6 +461,43 @@ function ZUI_LickAndTickle:ReShowNameplates()
 	C_Timer.After(0.3, function() SetCVar("nameplateShowFriends", 1)  end)
 end
 
+function ZUI_LickAndTickle:HideDisabledProfileButtons()
+    -- if the user has selected a custom emote. set profile2 true. hide and remove lick and tickle buttons
+    if (ZUI_LickAndTickle.db.realm.otherEmote) then
+        LAT_GUI.profile2 = true
+        for i, v in pairs(LAT_GUI.buttonTable) do
+            if (v.btnText ~= ZUI_LickAndTickle.db.realm.otherText) then
+                v:Hide()
+                table.remove(LAT_GUI.buttonTable, i) 
+            end
+        end
+
+    -- if the user hasent selected a custom emote. set profile2 false. hide and remove wrong buttons
+    else
+        LAT_GUI.profile2 = false
+        for i, v in pairs(LAT_GUI.buttonTable) do
+            if (v.btnText ~= "Lick" and v.btnText ~= "Tickle") then
+                v:Hide() 
+                table.remove(LAT_GUI.buttonTable, i)
+            end
+        end
+    end
+end
+
+function ZUI_LickAndTickle:CheckForPlater(nameplateid)
+    -- Checks for Plater Addon
+    local isPlaterAddon, namePlate
+    if (C_NamePlate.GetNamePlateForUnit(nameplateid).unitFrame) then
+        -- plater uses lowercase 'u' for their unitFrame
+        namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).unitFrame
+        isPlaterAddon = true
+    else
+        namePlate = C_NamePlate.GetNamePlateForUnit(nameplateid).UnitFrame
+        isPlaterAddon = false
+    end
+    return isPlaterAddon, namePlate
+end
+
 -- needs better locale support
 -- needs cleaning
 -- add lick and tickle button together
@@ -503,3 +511,5 @@ end
 -- make keybind for emote
 -- default profile set to wave, input profile, then profile for lick and tickle
 -- hide buttons without hiding display
+-- change addon name
+-- stop showing both profiles on startup until a nameplate event triggers
