@@ -47,6 +47,8 @@ local defaults = {
         licked = {},
         tickled = {},
         other = {},
+        otherText = "Wave",
+        otherEmote = "wave"
     },
     profile = {
         showOnFirstLoad = false,
@@ -518,3 +520,4 @@ end
 -- change addon name
 -- open options from minimap
 -- see if the addon NEEDs ACE3
+-- redesign inputframe backdrop
