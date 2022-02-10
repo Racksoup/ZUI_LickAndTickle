@@ -84,26 +84,40 @@ function ZUI_LickAndTickle:OnInitialize()
     LAT_GUI.ButtonFrame:RegisterForDrag("LeftButton")
     LAT_GUI.ButtonFrame:SetScript("OnDragStart", function() if(IsShiftKeyDown() == true) then LAT_GUI.ButtonFrame:StartMoving() end end)
     LAT_GUI.ButtonFrame:SetScript("OnDragStop", LAT_GUI.ButtonFrame.StopMovingOrSizing)
-    -- Calls NamePlateAdded() or NamePlateRemoved()
     LAT_GUI.ButtonFrame:SetScript("OnEvent", function(self, event, ...)
+        -- Calls NamePlateAdded()
         if (event == "NAME_PLATE_UNIT_ADDED") then
             local nameplateid = ...
             if (UnitGUID(nameplateid) ~= UnitGUID("Player"))then
             ZUI_LickAndTickle:NamePlateAdded(nameplateid) 
         end
         end
+        -- calls NamePlateRemoved()
         if (event == "NAME_PLATE_UNIT_REMOVED") then
             local nameplateid = ...
             ZUI_LickAndTickle:NamePlateRemoved(nameplateid)    
+        end
+        -- adds target to db when user sends chat emote
+        if (event == "CHAT_MSG_TEXT_EMOTE") then
+            local t = {}
+            for i in string.gmatch(..., "%S+") do
+                table.insert(t, i)
+            end
+            for i, v in ipairs(t) do
+                if ("You" == v) then 
+                    print("Hit")
+                    ZUI_LickAndTickle:AddTargetToDB(nil, true)
+                end
+            end
         end
     end)
     
     -- make buttons
     if (self.db.realm.otherEmote) then 
-        ZUI_LickAndTickle:CreateBtns("otherFrame", lickAndTickle, self.db.realm.otherText, self.db.realm.otherEmote)
+        ZUI_LickAndTickle:CreateEmoteButtons("otherFrame", lickAndTickle, self.db.realm.otherText, self.db.realm.otherEmote)
     else
-        ZUI_LickAndTickle:CreateBtns("tickleFrame", lickAndTickle, L["Tickle"], "tickle")
-        ZUI_LickAndTickle:CreateBtns("lickFrame", lickAndTickle, L["Lick"], "lick")
+        ZUI_LickAndTickle:CreateEmoteButtons("tickleFrame", lickAndTickle, L["Tickle"], "tickle")
+        ZUI_LickAndTickle:CreateEmoteButtons("lickFrame", lickAndTickle, L["Lick"], "lick")
     end
 end
 
@@ -116,6 +130,7 @@ function ZUI_LickAndTickle:OnEnable()
     -- Registers NamePlateAdded and NamePlateRemoved
     LAT_GUI.ButtonFrame:RegisterEvent("NAME_PLATE_UNIT_ADDED")
     LAT_GUI.ButtonFrame:RegisterEvent("NAME_PLATE_UNIT_REMOVED")
+    LAT_GUI.ButtonFrame:RegisterEvent("CHAT_MSG_TEXT_EMOTE")
 
     -- if first load, check if it should show UI on the first load
     if (ZUI_LickAndTickle.db.profile.showOnFirstLoad == false and ZUI_LickAndTickle.firstLoad == 1) then
@@ -179,7 +194,7 @@ function ZUI_LickAndTickle:CreateInterfaceButton(panel, yCord, buttonText, label
     label:SetText(labelText)
 end
 
-function ZUI_LickAndTickle:CreateBtns(frameName, parent, btnText, emote)
+function ZUI_LickAndTickle:CreateEmoteButtons(frameName, parent, btnText, emote)
     local points = {0, 16}
     if (btnText == "Lick") then points[1] = 0 points[2] = -16  end
 
@@ -191,7 +206,7 @@ function ZUI_LickAndTickle:CreateBtns(frameName, parent, btnText, emote)
     emoteButton:SetFrameLevel(0)
     emoteButton:SetSize(64, 20)
     emoteButton:SetPoint("CENTER", points[1], points[2])
-    emoteButton:SetScript("OnClick", function() ZUI_LickAndTickle:btnClicked(emote) end)
+    emoteButton:SetScript("OnClick", function() ZUI_LickAndTickle:AddTargetToDB(emote) end)
     emoteButton:Show()
 
     -- add text to emote button
@@ -204,12 +219,12 @@ function ZUI_LickAndTickle:CreateBtns(frameName, parent, btnText, emote)
     table.insert(LAT_GUI.buttonTable, emoteButton)
 end
 
-function ZUI_LickAndTickle:btnClicked(emote)
+function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote)
     local unitGuid = UnitGUID("target")
     local locClass, engClass, locRace, engRace, gender, name, server = GetPlayerInfoByGUID(unitGuid)
     
     -- does buttons emote
-    DoEmote(emote)
+    if (emote) then DoEmote(emote) end
     
     -- check if targeting a player, and they are the same of the same faction
     if (locClass and UnitFactionGroup("Target") == UnitFactionGroup("Player")) then 
@@ -243,7 +258,7 @@ function ZUI_LickAndTickle:btnClicked(emote)
                 if (emote == k.emote) then emoteInEmotesList = true end
                 end
             end
-            if (emoteInEmotesList) then 
+            if (emoteInEmotesList or isChatMsgEmote) then 
                 -- set first object
                 if (#self.db.realm.other == 0) then table.insert(self.db.realm.other, name) end
                 for i, v in ipairs(self.db.realm.other) do
@@ -446,7 +461,7 @@ function ZUI_LickAndTickle:CheckEmote()
             end
         end
         -- create new emote button
-        ZUI_LickAndTickle:CreateBtns("otherFrame", lickAndTickle, ZUI_LickAndTickle.db.realm.otherText, ZUI_LickAndTickle.db.realm.otherEmote)
+        ZUI_LickAndTickle:CreateEmoteButtons("otherFrame", lickAndTickle, ZUI_LickAndTickle.db.realm.otherText, ZUI_LickAndTickle.db.realm.otherEmote)
     end
 end
 
@@ -457,8 +472,8 @@ function ZUI_LickAndTickle:SwitchToLickAndTickle(self, button, down)
     ZUI_LickAndTickle.db.realm.otherText = nil
     ZUI_LickAndTickle.db.realm.otherEmote = nil
     
-    ZUI_LickAndTickle:CreateBtns("tickleFrame", lickAndTickle, L["Tickle"], "tickle")
-    ZUI_LickAndTickle:CreateBtns("lickFrame", lickAndTickle, L["Lick"], "lick")
+    ZUI_LickAndTickle:CreateEmoteButtons("tickleFrame", lickAndTickle, L["Tickle"], "tickle")
+    ZUI_LickAndTickle:CreateEmoteButtons("lickFrame", lickAndTickle, L["Lick"], "lick")
 end
 
 -- Utils
@@ -514,7 +529,6 @@ end
 
 -- needs better locale support
 -- add lick and tickle button together
--- track emotes without using buttons
 -- track all emotes other than just selected emotes
 -- make both realm based or profile based
 -- make keybind for emote
