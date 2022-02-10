@@ -155,10 +155,12 @@ function ZUI_LickAndTickle:CreateInterfaceOptions()
     local hideEmoteButtonsFunc = function() ZUI_LickAndTickle:HideAllEmoteButtons() end
     local showEmoteButtonsFunc = function() ZUI_LickAndTickle:ToggleProfileAndEmoteButtons() end
     local resetEmoteButtonsPos = function() ZUI_LickAndTickle:ResetEmoteButtonsPos() end
+    local switchToLickAndTickle = function() ZUI_LickAndTickle:SwitchToLickAndTickle() end
 
     ZUI_LickAndTickle:CreateInterfaceButton(panel, -50, "Hide", "Hide Emote Buttons", hideEmoteButtonsFunc)
     ZUI_LickAndTickle:CreateInterfaceButton(panel, -80, "Show", "Show Emote Buttons", showEmoteButtonsFunc)
     ZUI_LickAndTickle:CreateInterfaceButton(panel, -110, "Reset", "Reset Emote Buttons Position", resetEmoteButtonsPos)
+    ZUI_LickAndTickle:CreateInterfaceButton(panel, -140, "Switch", "Switch To Lick and Tickle Profile", switchToLickAndTickle)
 end
 
 function ZUI_LickAndTickle:ResetEmoteButtonsPos()
@@ -385,7 +387,7 @@ function ZUI_LickAndTickle:InputFrame()
         swapBtn:SetText("Lick&Tickle")
         swapBtn:SetWidth(100)
         swapBtn:SetHeight(18)
-        swapBtn:SetScript("OnClick", function(self, button, down) ZUI_LickAndTickle.SwapBtnPressed(self, button, down) end) 
+        swapBtn:SetScript("OnClick", function(self, button, down) ZUI_LickAndTickle.SwitchToLickAndTickle(self, button, down) end) 
         LAT_GUI.enterBtn = CreateFrame("Button", "enterbutton", inputFrame, "UIPanelButtonTemplate")
         local enterBtn = LAT_GUI.enterBtn
         enterBtn:SetPoint("BOTTOM", 50, 14)
@@ -448,8 +450,8 @@ function ZUI_LickAndTickle:CheckEmote()
     end
 end
 
-function ZUI_LickAndTickle:SwapBtnPressed(self, button, down)
-    LAT_GUI.inputFrame:Hide()
+function ZUI_LickAndTickle:SwitchToLickAndTickle(self, button, down)
+    if(LAT_GUI.inputFrame) then LAT_GUI.inputFrame:Hide() end
     ZUI_LickAndTickle:ReShowNameplates()
     ZUI_LickAndTickle:ToggleProfileAndEmoteButtons()
     ZUI_LickAndTickle.db.realm.otherText = nil
@@ -516,9 +518,6 @@ end
 -- track all emotes other than just selected emotes
 -- make both realm based or profile based
 -- make keybind for emote
--- change addon name
--- open options from minimap
 -- see if the addon NEEDs ACE3
 -- redesign inputframe backdrop
--- switch to profile lick and tickle - interface option
 -- switch to profile2 (open input window) - interface option
