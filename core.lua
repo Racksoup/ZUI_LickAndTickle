@@ -516,8 +516,9 @@ end
 -- track all emotes other than just selected emotes
 -- make both realm based or profile based
 -- make keybind for emote
--- default profile set to wave, input profile, then profile for lick and tickle
 -- change addon name
 -- open options from minimap
 -- see if the addon NEEDs ACE3
 -- redesign inputframe backdrop
+-- switch to profile lick and tickle - interface option
+-- switch to profile2 (open input window) - interface option

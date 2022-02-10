@@ -1,5 +1,5 @@
 ## Interface: 11402
-## Title: ZUI_LickAndTickle
+## Title: ZUI Friendly Emote Tracker
 ## Author: ZUI
 ## SavedVariables: ZUI_LickAndTickleDB
 ## OptionalDeps: Ace3
