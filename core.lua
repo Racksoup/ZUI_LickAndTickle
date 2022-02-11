@@ -48,10 +48,11 @@ local defaults = {
         tickled = {},
         other = {},
         otherText = "Wave",
-        otherEmote = "wave"
+        otherEmote = "wave",
+        profile2 = true
     },
     profile = {
-        showOnFirstLoad = false,
+        showOnFirstLoad = true,
     },
 }
 
@@ -65,12 +66,12 @@ SlashCmdList["RESETDB"] = function()
 end 
 
 function ZUI_LickAndTickle:OnInitialize()
-    --self.db:ResetDB() -- to reset for debuging
     LAT_GUI.buttonTable = {}
     LAT_GUI.iconTable = {}
     ZUI_LickAndTickle.firstLoad = true
     self.db = LibStub("AceDB-3.0"):New("ZUI_LickAndTickleDB", defaults, true)
     icon:Register("ZUI_LickAndTickle", ZUI_LDB, self.db.realm.minimap)
+    --self.db:ResetDB() -- to reset for debuging
 
     -- make interface options 
     ZUI_LickAndTickle:CreateInterfaceOptions()
@@ -105,15 +106,14 @@ function ZUI_LickAndTickle:OnInitialize()
             end
             for i, v in ipairs(t) do
                 if ("You" == v) then 
-                    print("Hit")
                     ZUI_LickAndTickle:AddTargetToDB(nil, true)
                 end
             end
         end
     end)
-    
+
     -- make buttons
-    if (self.db.realm.otherEmote) then 
+    if (self.db.realm.profile2) then 
         ZUI_LickAndTickle:CreateEmoteButtons("otherFrame", lickAndTickle, self.db.realm.otherText, self.db.realm.otherEmote)
     else
         ZUI_LickAndTickle:CreateEmoteButtons("tickleFrame", lickAndTickle, L["Tickle"], "tickle")
@@ -133,7 +133,7 @@ function ZUI_LickAndTickle:OnEnable()
     LAT_GUI.ButtonFrame:RegisterEvent("CHAT_MSG_TEXT_EMOTE")
 
     -- if first load, check if it should show UI on the first load
-    if (ZUI_LickAndTickle.db.profile.showOnFirstLoad == false and ZUI_LickAndTickle.firstLoad == 1) then
+    if (ZUI_LickAndTickle.db.profile.showOnFirstLoad == false and ZUI_LickAndTickle.firstLoad == true) then
         ZUI_LickAndTickle:OnDisable()
     end
     ZUI_LickAndTickle.firstLoad = false
@@ -306,7 +306,7 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
     -- check if player is same faction as new nameplate unit
     if (UnitFactionGroup(nameplateid) == UnitFactionGroup("Player")) then
         -- sets profile
-        if(LAT_GUI.profile2 == true) then inLickDB = true inTickleDB = true end
+        if(ZUI_LickAndTickle.db.realm.profile2 == true) then inLickDB = true inTickleDB = true end
 
         -- checks if target's name is in any DB
         for i, item in ipairs(ZUI_LickAndTickle.db.realm.licked) do
@@ -325,10 +325,10 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
         end
 
         -- Makes Nameplates
-        if (inEitherDB == false and LAT_GUI.profile2 == false and locClass) then ZUI_LickAndTickle:CreateSingleIcon("Interface\\AddOns\\ZUI_LickAndTickle\\images\\RedBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
+        if (inEitherDB == false and ZUI_LickAndTickle.db.realm.profile2 == false and locClass) then ZUI_LickAndTickle:CreateSingleIcon("Interface\\AddOns\\ZUI_LickAndTickle\\images\\RedBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
         elseif (inEitherDB == true and inLickDB == false and locClass) then  ZUI_LickAndTickle:CreateSingleIcon("Interface\\AddOns\\ZUI_LickAndTickle\\images\\BlueBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
         elseif (inEitherDB == true and inTickleDB == false and locClass) then ZUI_LickAndTickle:CreateSingleIcon("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
-        elseif (LAT_GUI.profile2 == true and inOtherDB == false and locClass) then ZUI_LickAndTickle:CreateSingleIcon("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
+        elseif (ZUI_LickAndTickle.db.realm.profile2 == true and inOtherDB == false and locClass) then ZUI_LickAndTickle:CreateSingleIcon("Interface\\AddOns\\ZUI_LickAndTickle\\images\\YellowBall.blp", namePlate, nameplateid, unitGuid, unitname, isPlaterAddon) 
         end
     end
 end
@@ -453,8 +453,10 @@ function ZUI_LickAndTickle:CheckEmote()
         print(myString)
     -- if emote was found look through button table
     else
+        -- set to profile 2 
+        ZUI_LickAndTickle.db.realm.profile2 = true
         for i, v in pairs(LAT_GUI.buttonTable) do
-            -- found the emote, set to profile 2 by hiding lick and tickle buttons
+            -- hide lick and tickle buttons
             if (v.emote == "lick" or v.emote == "tickle") then
                 v:Hide()
             end
@@ -475,6 +477,8 @@ function ZUI_LickAndTickle:SwitchToLickAndTickle(self, button, down)
     ZUI_LickAndTickle:ToggleProfileAndEmoteButtons()
     ZUI_LickAndTickle.db.realm.otherText = nil
     ZUI_LickAndTickle.db.realm.otherEmote = nil
+    ZUI_LickAndTickle.db.realm.profile2 = false
+    
     
     ZUI_LickAndTickle:CreateEmoteButtons("tickleFrame", lickAndTickle, L["Tickle"], "tickle")
     ZUI_LickAndTickle:CreateEmoteButtons("lickFrame", lickAndTickle, L["Lick"], "lick")
@@ -492,8 +496,7 @@ end
 
 function ZUI_LickAndTickle:ToggleProfileAndEmoteButtons()
     -- if the user has selected a custom emote. set profile2 true. hide and remove lick and tickle buttons
-    if (ZUI_LickAndTickle.db.realm.otherEmote) then
-        LAT_GUI.profile2 = true
+    if (ZUI_LickAndTickle.db.realm.profile2) then
         for i, v in pairs(LAT_GUI.buttonTable) do
             if (v.btnText ~= ZUI_LickAndTickle.db.realm.otherText) then
                 v:Hide()
@@ -505,7 +508,6 @@ function ZUI_LickAndTickle:ToggleProfileAndEmoteButtons()
 
     -- if the user hasent selected a custom emote. set profile2 false. hide and remove wrong buttons
     else
-        LAT_GUI.profile2 = false
         for i, v in pairs(LAT_GUI.buttonTable) do
             if (v.btnText ~= "Lick" and v.btnText ~= "Tickle") then
                 v:Hide() 
