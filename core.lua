@@ -532,7 +532,7 @@ function ZUI_LickAndTickle:CheckForPlater(nameplateid)
 end
 
 -- needs better locale support
--- see if the addon NEEDs ACE3
+-- add saved profile setting
 -- redesign inputframe backdrop
 -- make both realm based or profile based - interface option
 -- make keybind for emote - inteface option
