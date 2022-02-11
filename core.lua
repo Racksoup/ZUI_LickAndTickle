@@ -104,28 +104,28 @@ function ZUI_LickAndTickle:OnInitialize()
         end
         -- adds target to db when user sends chat emote
         if (event == "CHAT_MSG_TEXT_EMOTE") then
-            if (ZUI_LickAndTickle.emoteButtonPressed == false) then
+            if (ZUI_LickAndTickle.emoteButtonPressed == false or ZUI_LickAndTickle.emoteButtonPressed == nil) then
                 local t = {}
                 local wasPlayer = false
-                local emote
+                local typedEmote
                 for i in string.gmatch(..., "%S+") do
                     table.insert(t, i)
                 end
                 if ("You" == t[1]) then 
                     wasPlayer = true
                 end
-                -- check if typed emote was lick or tickle to add too the db
+                -- check if typedEmote was lick or tickle to add too the db
                 for i, v in ipairs(t) do
                     if ("lick" == v) then
-                        emote = "lick"
+                        typedEmote = "lick"
                     end
                     if ("tickle" == v) then
-                        emote = "tickle"
+                        typedEmote = "tickle"
                     end
                 end
-                if (wasPlayer and emote == "lick" or wasPlayer and emote == "tickle") then
-                    ZUI_LickAndTickle:AddTargetToDB(nil, true, "profile", emote)
-                    ZUI_LickAndTickle:AddTargetToDB(nil, true, "realm", emote)
+                if (wasPlayer and typedEmote == "lick" or wasPlayer and typedEmote == "tickle") then
+                    ZUI_LickAndTickle:AddTargetToDB(nil, true, "profile", typedEmote)
+                    ZUI_LickAndTickle:AddTargetToDB(nil, true, "realm", typedEmote)
                 elseif (wasPlayer) then
                     ZUI_LickAndTickle:AddTargetToDB(nil, true, "profile")
                     ZUI_LickAndTickle:AddTargetToDB(nil, true, "realm")
@@ -273,8 +273,7 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
     if (emote) then DoEmote(emote) end
     local unitGuid = UnitGUID("target")
     -- takes user input lick or tickle emotes and sets them after already sending the emote through
-    local emote = emote
-    if (LorT) then emote = LorT end
+    if (LorT == "lick" or LorT == "tickle") then emote = LorT end
 
     -- checks if target exits
     if (unitGuid) then
@@ -300,32 +299,58 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
                 emoteColor = "yellow"
                 -- set first obj. first loop not working without any obj in table. put first target in
                 if (#mainDatabase.tickled == 0) then table.insert(mainDatabase.tickled, name) end
+                -- check if in tickle DB, if not add to DB
                 for i, v in ipairs(mainDatabase.tickled) do
                     if (v == name) then nameInDB = true end
                 end
                 if (nameInDB == false) then 
                     table.insert(mainDatabase.tickled, name) 
                 end
-            elseif (emote == "lick") then
+                -- check if in Other DB, if not add to DB
+                local inTheOtherDB = false
+                if (#mainDatabase.other == 0) then table.insert(mainDatabase.other, name) end
+                for i, v in ipairs(mainDatabase.other) do
+                    if (v == name) then inTheOtherDB = true end
+                end
+                if (inTheOtherDB == false) then 
+                    print("hit")
+                    table.insert(mainDatabase.other, name) 
+                end
+            end
+
+            if (emote == "lick") then
                 emoteColor = "blue"
                 -- set first obj
                 if (#mainDatabase.licked == 0) then table.insert(mainDatabase.licked, name) end
+                -- check if in licked DB, if not add to DB
                 for i, v in ipairs(mainDatabase.licked) do
                     if (v == name) then nameInDB = true end
                 end
                 if (nameInDB == false) then 
                     table.insert(mainDatabase.licked, name) 
                 end
-            else 
+                -- check if in Other DB, if not add to DB
+                local inTheOtherDB = false
+                if (#mainDatabase.other == 0) then table.insert(mainDatabase.other, name) end
+                for i, v in ipairs(mainDatabase.other) do
+                    if (v == name) then inTheOtherDB = true end
+                end
+                if (inTheOtherDB == false) then 
+                    print("hit")
+                    table.insert(mainDatabase.other, name) 
+                end   
+            end   
+
+            if (emote == nil or isChatMsgEmote) then 
                 emoteColor = "yellow"
                 -- check if the given emote is in the list of in-game emotes
                 for i, v in pairs(ZUI_LickAndTickle.emotes) do
                     for j, k in ipairs(v) do
-                    if (emote == k.emote) then emoteInEmotesList = true end
+                        if (emote == k.emote) then emoteInEmotesList = true end
                     end
                 end
-                if (emoteInEmotesList or isChatMsgEmote) then 
-                    -- set first object
+                if (emoteInEmotesList) then
+                -- set first object
                     if (#mainDatabase.other == 0) then table.insert(mainDatabase.other, name) end
                     for i, v in ipairs(mainDatabase.other) do
                         if (v == name) then nameInDB = true end
@@ -348,13 +373,13 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
                         if (icon.color == "red") then 
                             ZUI_LickAndTickle:NamePlateAdded(icon.nameplateid)
                         end
-                        return
                     end
                 end
             end
         end
     end
 end
+
 
 function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
     local unitname = UnitName(nameplateid)
@@ -612,10 +637,7 @@ end
 -- make keybind for emote - inteface option
 -- add lick and tickle button together - interface option
 -- bug, lick can remove tickle (after 2.5s) --- sometimes. because of timeout UnregisterEvent
+-- custom lick button having issues
 
--- infotext in - interface
--- if user makes lick and tickle buttons, make them add to lick or tickle DB
--- when tickle or lick button is hit, add to other db too
-
--- final tests
+-- final tests (check dbs)
 -- final comments
