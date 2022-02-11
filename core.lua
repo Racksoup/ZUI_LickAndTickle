@@ -296,6 +296,7 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
             -- for each emote look through their DB (there are 3 DB's, one for each emote) 
             -- and check if the target is already in the DB. if not add them to DB
             if (emote == "tickle") then 
+                
                 emoteColor = "yellow"
                 -- set first obj. first loop not working without any obj in table. put first target in
                 if (#mainDatabase.tickled == 0) then table.insert(mainDatabase.tickled, name) end
@@ -318,6 +319,7 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
             end
 
             if (emote == "lick") then
+                
                 emoteColor = "blue"
                 -- set first obj
                 if (#mainDatabase.licked == 0) then table.insert(mainDatabase.licked, name) end
@@ -361,10 +363,12 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
             
             -- only run once
             if (DB == "realm") then
+                -- reset icon color if on profile2 so the lick can destroy yellow frames
+                if (ZUI_LickAndTickle.db.realm.profile2) then emoteColor = "yellow" end
                 -- look through all icons. if the icon is on our target, hide it and remove it from the table
                 for i, icon in pairs(LAT_GUI.iconTable) do
                     -- find the right icon, only make icon disapear if emote is supposed to destroy that color
-                    if (icon.unitname == name and icon.color == "red" or icon.unitname == name and icon.color == emoteColor) then 
+                    if (icon.unitname == name and icon.color == "red" or icon.unitname == name and icon.color == emoteColor) then
                         table.remove(LAT_GUI.iconTable, i) 
                         icon:Hide()
                         -- if the icon was red we need to spawn a new icon (blue or red)
@@ -635,7 +639,6 @@ end
 -- make keybind for emote - inteface option
 -- add lick and tickle button together - interface option
 -- bug, lick can remove tickle (after 2.5s) --- sometimes. because of timeout UnregisterEvent
--- custom lick button having issues
 
 -- final tests (check dbs)
 -- final comments
