@@ -111,6 +111,7 @@ function ZUI_LickAndTickle:OnInitialize()
                 for i in string.gmatch(..., "%S+") do
                     table.insert(t, i)
                 end
+                -- check if typed emote was sent by the player
                 if ("You" == t[1]) then 
                     wasPlayer = true
                 end
@@ -123,9 +124,13 @@ function ZUI_LickAndTickle:OnInitialize()
                         typedEmote = "tickle"
                     end
                 end
+                -- if the typed emote was sent by the player, and it was lick or tickle then - 
+                -- it needs to change the lick and tickle DBs aswell
                 if (wasPlayer and typedEmote == "lick" or wasPlayer and typedEmote == "tickle") then
                     ZUI_LickAndTickle:AddTargetToDB(nil, true, "profile", typedEmote)
                     ZUI_LickAndTickle:AddTargetToDB(nil, true, "realm", typedEmote)
+                -- if the typed emote was sent by the player, but its not lick or tickle then - 
+                -- only change other DB
                 elseif (wasPlayer) then
                     ZUI_LickAndTickle:AddTargetToDB(nil, true, "profile")
                     ZUI_LickAndTickle:AddTargetToDB(nil, true, "realm")
@@ -183,33 +188,37 @@ function ZUI_LickAndTickle:HideAllEmoteButtons()
 end
 
 function ZUI_LickAndTickle:CreateInterfaceOptions()
+    -- make frame
     local panel = CreateFrame("Frame")
-    panel.name = "Friendly Emote Tracker"               
+    panel.name = "Friendly Emote Tracker"            
+    -- add frame to interface options   
     InterfaceOptions_AddCategory(panel) 
     local title = panel:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
     title:SetPoint("TOP", 0, -8)
     title:SetText("ZUI Friendly Emote Tracker")
 
+    -- set button functions
     local hideEmoteButtonsFunc = function() ZUI_LickAndTickle:HideAllEmoteButtons() end
     local showEmoteButtonsFunc = function() ZUI_LickAndTickle:ToggleProfileAndEmoteButtons() end
     local resetEmoteButtonsPos = function() ZUI_LickAndTickle:ResetEmoteButtonsPos() end
     local switchToLickAndTickle = function() ZUI_LickAndTickle:SwitchToLickAndTickle() end
     local openInputFrame = function() ZUI_LickAndTickle:InputFrame() end
-
+    -- create buttons
     ZUI_LickAndTickle:CreateInterfaceButton(panel, -50, "Hide", "Hide Emote Buttons", hideEmoteButtonsFunc)
     ZUI_LickAndTickle:CreateInterfaceButton(panel, -80, "Show", "Show Emote Buttons", showEmoteButtonsFunc)
     ZUI_LickAndTickle:CreateInterfaceButton(panel, -110, "Reset", "Reset Emote Buttons Position", resetEmoteButtonsPos)
     ZUI_LickAndTickle:CreateInterfaceButton(panel, -140, "Switch", "Switch To Lick and Tickle Profile", switchToLickAndTickle)
     ZUI_LickAndTickle:CreateInterfaceButton(panel, -170, "Input Emote", "Switch To Default Profile", openInputFrame)
-    ZUI_LickAndTickle:CreateCheckButton(panel)
+    ZUI_LickAndTickle:CreateInterfaceCheckButton(panel)
 end
 
-function ZUI_LickAndTickle:CreateCheckButton(panel)
+function ZUI_LickAndTickle:CreateInterfaceCheckButton(panel)
     local checkButton = CreateFrame("CheckButton", nil, panel, "ChatConfigCheckButtonTemplate")
     checkButton:SetPoint("TOPLEFT", 416, -200)
     checkButton:SetSize(25,25)
     checkButton:SetChecked(true)
     checkButton:SetScript("OnClick", function() 
+        -- Inverts useRealmSettigns
         ZUI_LickAndTickle.db.profile.useRealmSetting = not ZUI_LickAndTickle.db.profile.useRealmSetting
         ZUI_LickAndTickle:ReShowNameplates()
     end)
@@ -235,6 +244,7 @@ function ZUI_LickAndTickle:ResetEmoteButtonsPos()
 end
 
 function ZUI_LickAndTickle:CreateEmoteButtons(frameName, parent, btnText, emote)
+    -- set button points
     local points = {0, 16}
     if (btnText == "Lick") then points[1] = 0 points[2] = -16  end
 
@@ -247,15 +257,15 @@ function ZUI_LickAndTickle:CreateEmoteButtons(frameName, parent, btnText, emote)
     emoteButton:SetSize(64, 20)
     emoteButton:SetPoint("CENTER", points[1], points[2])
     emoteButton:SetScript("OnClick", function() 
+        -- register and unregister CHAT_MSG_TEXT_EMOTE when button is clicked so that it doesn't run twice
+        -- added emoteButtonPressed bool to make it more succure. CHAT_MSG_TEXT_EMOTE wasn't always working
         LAT_GUI.ButtonFrame:UnregisterEvent("CHAT_MSG_TEXT_EMOTE")
         ZUI_LickAndTickle.emoteButtonPressed = true
+        -- add to both db's and remove/replace icon
         ZUI_LickAndTickle:AddTargetToDB(emote, nil, "profile") 
         ZUI_LickAndTickle:AddTargetToDB(emote, nil, "realm") 
-        
-
-            LAT_GUI.ButtonFrame:RegisterEvent("CHAT_MSG_TEXT_EMOTE")  
-            ZUI_LickAndTickle.emoteButtonPressed = false
-
+        LAT_GUI.ButtonFrame:RegisterEvent("CHAT_MSG_TEXT_EMOTE")  
+        ZUI_LickAndTickle.emoteButtonPressed = false
     end)
     emoteButton:Show()
 
@@ -319,7 +329,6 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
             end
 
             if (emote == "lick") then
-                
                 emoteColor = "blue"
                 -- set first obj
                 if (#mainDatabase.licked == 0) then table.insert(mainDatabase.licked, name) end
@@ -353,6 +362,7 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
                 if (emoteInEmotesList) then
                 -- set first object
                     if (#mainDatabase.other == 0) then table.insert(mainDatabase.other, name) end
+                    -- check if in Other DB, if not add to DB
                     for i, v in ipairs(mainDatabase.other) do
                         if (v == name) then nameInDB = true end
                     end
@@ -575,14 +585,15 @@ function ZUI_LickAndTickle:CheckEmote()
 end
 
 function ZUI_LickAndTickle:SwitchToLickAndTickle(self, button, down)
+    -- toggle UI frames
     if(LAT_GUI.inputFrame) then LAT_GUI.inputFrame:Hide() end
     ZUI_LickAndTickle:ReShowNameplates()
     ZUI_LickAndTickle:ToggleProfileAndEmoteButtons()
+    -- set vars
     ZUI_LickAndTickle.db.realm.otherText = nil
     ZUI_LickAndTickle.db.realm.otherEmote = nil
     ZUI_LickAndTickle.db.realm.profile2 = false
-    
-    
+    -- create new buttons
     ZUI_LickAndTickle:CreateEmoteButtons("tickleFrame", lickAndTickle, L["Tickle"], "tickle")
     ZUI_LickAndTickle:CreateEmoteButtons("lickFrame", lickAndTickle, L["Lick"], "lick")
 end
@@ -593,6 +604,7 @@ function ZUI_LickAndTickle:setEmoteList(emotes)
 end
 
 function ZUI_LickAndTickle:ReShowNameplates()
+    -- set timer so that frames get destroyed and re-created
     SetCVar("nameplateShowFriends", 0)
 	C_Timer.After(0.3, function() SetCVar("nameplateShowFriends", 1)  end)
 end
