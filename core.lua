@@ -104,25 +104,26 @@ function ZUI_LickAndTickle:OnInitialize()
         end
         -- adds target to db when user sends chat emote
         if (event == "CHAT_MSG_TEXT_EMOTE") then
-            if (ZUI_LickAndTickle.emoteButtonPressed == false or ZUI_LickAndTickle.emoteButtonPressed == nil) then
+            if (ZUI_LickAndTickle.emoteButtonPressed == false) then
                 local t = {}
                 local wasPlayer = false
                 local emote
                 for i in string.gmatch(..., "%S+") do
                     table.insert(t, i)
                 end
+                if ("You" == t[1]) then 
+                    wasPlayer = true
+                end
+                -- check if typed emote was lick or tickle to add too the db
                 for i, v in ipairs(t) do
-                    if ("You" == v) then 
-                        wasPlayer = true
-                    end
-                    if ("Licked" == v) then
+                    if ("lick" == v) then
                         emote = "lick"
                     end
-                    if ("Tickled" == v) then
+                    if ("tickle" == v) then
                         emote = "tickle"
                     end
                 end
-                if (wasPlayer and emote) then
+                if (wasPlayer and emote == "lick" or wasPlayer and emote == "tickle") then
                     ZUI_LickAndTickle:AddTargetToDB(nil, true, "profile", emote)
                     ZUI_LickAndTickle:AddTargetToDB(nil, true, "realm", emote)
                 elseif (wasPlayer) then
@@ -250,8 +251,11 @@ function ZUI_LickAndTickle:CreateEmoteButtons(frameName, parent, btnText, emote)
         ZUI_LickAndTickle.emoteButtonPressed = true
         ZUI_LickAndTickle:AddTargetToDB(emote, nil, "profile") 
         ZUI_LickAndTickle:AddTargetToDB(emote, nil, "realm") 
-        ZUI_LickAndTickle.emoteButtonPressed = false
-        C_Timer.After(0.3, function() LAT_GUI.ButtonFrame:RegisterEvent("CHAT_MSG_TEXT_EMOTE")  end)
+        
+        C_Timer.After(2.5, function() 
+            LAT_GUI.ButtonFrame:RegisterEvent("CHAT_MSG_TEXT_EMOTE")  
+            ZUI_LickAndTickle.emoteButtonPressed = false
+        end)
     end)
     emoteButton:Show()
 
@@ -269,6 +273,7 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
     if (emote) then DoEmote(emote) end
     local unitGuid = UnitGUID("target")
     -- takes user input lick or tickle emotes and sets them after already sending the emote through
+    local emote = emote
     if (LorT) then emote = LorT end
 
     -- checks if target exits
@@ -606,9 +611,11 @@ end
 -- needs better locale support
 -- make keybind for emote - inteface option
 -- add lick and tickle button together - interface option
--- bug, lick can remove tickle --- sometimes. because of timeout UnregisterEvent
+-- bug, lick can remove tickle (after 2.5s) --- sometimes. because of timeout UnregisterEvent
 
 -- infotext in - interface
--- let lick and tickle input by player trigger lick and tickle buttons
 -- if user makes lick and tickle buttons, make them add to lick or tickle DB
 -- when tickle or lick button is hit, add to other db too
+
+-- final tests
+-- final comments
