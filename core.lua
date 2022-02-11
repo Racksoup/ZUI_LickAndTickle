@@ -674,5 +674,3 @@ end
 -- needs better locale support
 -- make keybind for emote - inteface option
 -- add lick and tickle button together - interface option
-
--- final tests (check dbs)
