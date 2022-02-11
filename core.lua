@@ -58,16 +58,10 @@ local defaults = {
 SLASH_RESETDB1 = "/lat-reset"
 SLASH_RESETDB2 = "/latre"
 SlashCmdList["RESETDB"] = function()
-    -- save emote if on profile2 so that it will reshow the buttons
-    local emoteText, emote 
-    if (ZUI_LickAndTickle.db.realm.otherText) then emoteText = ZUI_LickAndTickle.db.realm.otherText end
-    if (ZUI_LickAndTickle.db.realm.otherEmote) then emote = ZUI_LickAndTickle.db.realm.otherEmote end
+    ZUI_LickAndTickle:ReShowNameplates()
     ZUI_LickAndTickle.db:ResetDB()
-    if (emoteText) then ZUI_LickAndTickle.db.realm.otherText = emoteText end
-    if (emote) then ZUI_LickAndTickle.db.realm.otherEmote = emote end
     ZUI_LickAndTickle:OnDisable()
     ZUI_LickAndTickle:OnEnable()
-    ZUI_LickAndTickle:ReShowNameplates()
 end 
 
 function ZUI_LickAndTickle:OnInitialize()
@@ -111,6 +105,7 @@ function ZUI_LickAndTickle:OnInitialize()
             end
             for i, v in ipairs(t) do
                 if ("You" == v) then 
+                    print("Hit")
                     ZUI_LickAndTickle:AddTargetToDB(nil, true)
                 end
             end
@@ -211,12 +206,7 @@ function ZUI_LickAndTickle:CreateEmoteButtons(frameName, parent, btnText, emote)
     emoteButton:SetFrameLevel(0)
     emoteButton:SetSize(64, 20)
     emoteButton:SetPoint("CENTER", points[1], points[2])
-    emoteButton:SetScript("OnClick", function() 
-        -- unregister so that it wont fire twice when chat msg appears
-        LAT_GUI.ButtonFrame:UnregisterEvent("CHAT_MSG_TEXT_EMOTE") 
-        ZUI_LickAndTickle:AddTargetToDB(emote, false) 
-        LAT_GUI.ButtonFrame:RegisterEvent("CHAT_MSG_TEXT_EMOTE")
-    end)
+    emoteButton:SetScript("OnClick", function() ZUI_LickAndTickle:AddTargetToDB(emote) end)
     emoteButton:Show()
 
     -- add text to emote button
@@ -265,7 +255,7 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote)
             -- check if the given emote is in the list of in-game emotes
             for i, v in pairs(ZUI_LickAndTickle.emotes) do
                 for j, k in ipairs(v) do
-                if (emote == k.emote and isChatMsgEmote) then print("Here") emoteInEmotesList = true end
+                if (emote == k.emote) then emoteInEmotesList = true end
                 end
             end
             if (emoteInEmotesList or isChatMsgEmote) then 
