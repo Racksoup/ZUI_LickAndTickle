@@ -10,6 +10,20 @@ L["|cFFCFCFCF/fet-reset or /fetre to reset|r"] = true
 L["Enter Other Emote"] = true
 L["|cfffc4e85Emote not found. Please try another emote|r"] = true
 
+-- Interface options UI
+L["Friendly Emote Tracker"] = true
+L["ZUI Friendly Emote Tracker"] = true
+L["Hide"] = true
+L["Hide Emote Buttons"] = true
+L["Show"] = true
+L["Show Emote Buttons"] = true
+L["Reset"] = true
+L["Reset Emote Buttons Position"] = true
+L["Switch"] = true
+L["Switch To Lick And Tickle Profile"] = true
+L["Input Emote"] = true
+L["Switch To Default Profile"] = true
+
 -- Animation & Voice Emotes
 L["Angry"] = true
 L["Applaud"] = true

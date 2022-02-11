@@ -190,12 +190,12 @@ end
 function ZUI_LickAndTickle:CreateInterfaceOptions()
     -- make frame
     local panel = CreateFrame("Frame")
-    panel.name = "Friendly Emote Tracker"            
+    panel.name = L["Friendly Emote Tracker"]            
     -- add frame to interface options   
     InterfaceOptions_AddCategory(panel) 
     local title = panel:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
     title:SetPoint("TOP", 0, -8)
-    title:SetText("ZUI Friendly Emote Tracker")
+    title:SetText(L["ZUI Friendly Emote Tracker"])
 
     -- set button functions
     local hideEmoteButtonsFunc = function() ZUI_LickAndTickle:HideAllEmoteButtons() end
@@ -204,11 +204,11 @@ function ZUI_LickAndTickle:CreateInterfaceOptions()
     local switchToLickAndTickle = function() ZUI_LickAndTickle:SwitchToLickAndTickle() end
     local openInputFrame = function() ZUI_LickAndTickle:InputFrame() end
     -- create buttons
-    ZUI_LickAndTickle:CreateInterfaceButton(panel, -50, "Hide", "Hide Emote Buttons", hideEmoteButtonsFunc)
-    ZUI_LickAndTickle:CreateInterfaceButton(panel, -80, "Show", "Show Emote Buttons", showEmoteButtonsFunc)
-    ZUI_LickAndTickle:CreateInterfaceButton(panel, -110, "Reset", "Reset Emote Buttons Position", resetEmoteButtonsPos)
-    ZUI_LickAndTickle:CreateInterfaceButton(panel, -140, "Switch", "Switch To Lick and Tickle Profile", switchToLickAndTickle)
-    ZUI_LickAndTickle:CreateInterfaceButton(panel, -170, "Input Emote", "Switch To Default Profile", openInputFrame)
+    ZUI_LickAndTickle:CreateInterfaceButton(panel, -50, L["Hide"], L["Hide Emote Buttons"], hideEmoteButtonsFunc)
+    ZUI_LickAndTickle:CreateInterfaceButton(panel, -80, L["Show"], L["Show Emote Buttons"], showEmoteButtonsFunc)
+    ZUI_LickAndTickle:CreateInterfaceButton(panel, -110, L["Reset"], L["Reset Emote Buttons Position"], resetEmoteButtonsPos)
+    ZUI_LickAndTickle:CreateInterfaceButton(panel, -140, L["Switch"], L["Switch To Lick And Tickle Profile"], switchToLickAndTickle)
+    ZUI_LickAndTickle:CreateInterfaceButton(panel, -170, L["Input Emote"], L["Switch To Default Profile"], openInputFrame)
     ZUI_LickAndTickle:CreateInterfaceCheckButton(panel)
 end
 
