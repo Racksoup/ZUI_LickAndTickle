@@ -75,7 +75,7 @@ function ZUI_LickAndTickle:OnInitialize()
     ZUI_LickAndTickle.firstLoad = true
     self.db = LibStub("AceDB-3.0"):New("ZUI_LickAndTickleDB", defaults, true)
     icon:Register("ZUI_LickAndTickle", ZUI_LDB, self.db.realm.minimap)
-    self.db:ResetDB() -- to reset for debuging
+    --self.db:ResetDB() -- to reset for debuging
 
     -- make interface options 
     ZUI_LickAndTickle:CreateInterfaceOptions()
@@ -192,7 +192,8 @@ function ZUI_LickAndTickle:CreateCheckButton(panel)
     checkButton:SetSize(25,25)
     checkButton:SetChecked(true)
     checkButton:SetScript("OnClick", function() 
-        ZUI_LickAndTickle.db.profile.useRealmSettings = not ZUI_LickAndTickle.db.profile.useRealmSettings
+        ZUI_LickAndTickle.db.profile.useRealmSetting = not ZUI_LickAndTickle.db.profile.useRealmSetting
+        ZUI_LickAndTickle:ReShowNameplates()
     end)
     local label = checkButton:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
     label:SetPoint("CENTER", -278, 0)
@@ -327,26 +328,25 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB)
             end
         end
     end
-     -- dev print statement
-     for i, v in pairs(ZUI_LickAndTickle.db.realm.tickled) do
-        print("realm", i, "==", v)
-    end
-    for i, v in pairs(ZUI_LickAndTickle.db.profile.tickled) do
-        print("profile", i, "==", v)
-    end
-    --
 end
 
 function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
     local unitname = UnitName(nameplateid)
     local unitGuid = UnitGUID(nameplateid)
     local locClass, engClass, locRace, engRace, gender, name, server = GetPlayerInfoByGUID(unitGuid) -- gets target info
-    local faction
+    local faction, mainDatabase
     local inLickDB = false
     local inTickleDB = false
     local inOtherDB = false
     local inEitherDB = true
     local isPlaterAddon, namePlate = ZUI_LickAndTickle:CheckForPlater(nameplateid) -- Gets nameplate
+
+    -- select which database to use for showing icons
+    if (ZUI_LickAndTickle.db.profile.useRealmSetting == true) then
+        mainDatabase = ZUI_LickAndTickle.db.realm
+    elseif (ZUI_LickAndTickle.db.profile.useRealmSetting == false) then
+        mainDatabase = ZUI_LickAndTickle.db.profile
+    end
 
     -- Hides the wrong profiles buttons
     ZUI_LickAndTickle:ToggleProfileAndEmoteButtons()
@@ -357,13 +357,13 @@ function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
         if(ZUI_LickAndTickle.db.realm.profile2 == true) then inLickDB = true inTickleDB = true end
 
         -- checks if target's name is in any DB
-        for i, item in ipairs(ZUI_LickAndTickle.db.realm.licked) do
+        for i, item in ipairs(mainDatabase.licked) do
             if (item == unitname) then inLickDB = true end
         end
-        for i, item in ipairs(ZUI_LickAndTickle.db.realm.tickled) do
+        for i, item in ipairs(mainDatabase.tickled) do
             if (item == unitname) then inTickleDB = true end
         end
-        for i, item in ipairs(ZUI_LickAndTickle.db.realm.other) do
+        for i, item in ipairs(mainDatabase.other) do
             if (item == unitname) then inOtherDB = true end
         end
         if (inLickDB == false and inTickleDB == false) then
