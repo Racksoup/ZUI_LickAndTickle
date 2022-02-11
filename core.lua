@@ -53,6 +53,7 @@ local defaults = {
     },
     profile = {
         showOnFirstLoad = true,
+        useRealmSetting = true
     },
 }
 
@@ -176,6 +177,21 @@ function ZUI_LickAndTickle:CreateInterfaceOptions()
     ZUI_LickAndTickle:CreateInterfaceButton(panel, -80, "Show", "Show Emote Buttons", showEmoteButtonsFunc)
     ZUI_LickAndTickle:CreateInterfaceButton(panel, -110, "Reset", "Reset Emote Buttons Position", resetEmoteButtonsPos)
     ZUI_LickAndTickle:CreateInterfaceButton(panel, -140, "Switch", "Switch To Lick and Tickle Profile", switchToLickAndTickle)
+    ZUI_LickAndTickle:CreateCheckButton(panel)
+end
+
+function ZUI_LickAndTickle:CreateCheckButton(panel)
+    local checkButton = CreateFrame("CheckButton", nil, panel, "ChatConfigCheckButtonTemplate")
+    checkButton:SetPoint("TOPLEFT", 416, -170)
+    checkButton:SetSize(25,25)
+    checkButton:SetChecked(true)
+    checkButton:SetScript("OnClick", function() 
+        ZUI_LickAndTickle.db.profile.useRealmSettings = not ZUI_LickAndTickle.db.profile.useRealmSettings
+        print(ZUI_LickAndTickle.db.profile.useRealmSettings)
+    end)
+    local label = checkButton:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
+    label:SetPoint("CENTER", -278, 0)
+    label:SetText("Use Data From All Characters")
 end
 
 function ZUI_LickAndTickle:ResetEmoteButtonsPos()
@@ -185,12 +201,12 @@ end
 
 function ZUI_LickAndTickle:CreateInterfaceButton(panel, yCord, buttonText, labelText, buttonFunc)
     local button = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
-    button:SetPoint("TOPLEFT", 320, yCord)
+    button:SetPoint("TOPLEFT", 330, yCord)
     button:SetSize(200, 25)
     button:SetText(buttonText)
     button:SetScript("OnClick", function() buttonFunc() end)
     local label = button:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
-    label:SetPoint("CENTER", -298, 0)
+    label:SetPoint("CENTER", -278, 0)
     label:SetText(labelText)
 end
 
@@ -534,10 +550,10 @@ function ZUI_LickAndTickle:CheckForPlater(nameplateid)
 end
 
 -- needs better locale support
--- add saved profile setting
 -- redesign inputframe backdrop
 -- make both realm based or profile based - interface option
 -- make keybind for emote - inteface option
 -- switch to profile2 (open input window) - interface option
 -- add lick and tickle button together - interface option
 -- infotext in - interface
+-- track data in both profile and account wide
