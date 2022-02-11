@@ -305,8 +305,9 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
             
             -- for each emote look through their DB (there are 3 DB's, one for each emote) 
             -- and check if the target is already in the DB. if not add them to DB
+
+            -- for button click or chat message, if emote is tickle
             if (emote == "tickle") then 
-                print(emote)
                 emoteColor = "yellow"
                 -- set first obj. first loop not working without any obj in table. put first target in
                 if (#mainDatabase.tickled == 0) then table.insert(mainDatabase.tickled, name) end
@@ -328,6 +329,7 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
                 end
             end
 
+            -- for button click or chat message, if emote is lick
             if (emote == "lick") then
                 emoteColor = "blue"
                 -- set first obj
@@ -350,9 +352,31 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
                 end   
             end   
 
+            -- for chat messages
             if (emote == nil and isChatMsgEmote) then 
                 emoteColor = "yellow"
-                print("hit")
+                -- check if the given emote is in the list of in-game emotes
+                for i, v in pairs(ZUI_LickAndTickle.emotes) do
+                    for j, k in ipairs(v) do
+                        if (emote == k.emote) then emoteInEmotesList = true end
+                    end
+                end
+                if (emoteInEmotesList) then
+                -- set first object
+                    if (#mainDatabase.other == 0) then table.insert(mainDatabase.other, name) end
+                    -- check if in Other DB, if not add to DB
+                    for i, v in ipairs(mainDatabase.other) do
+                        if (v == name) then nameInDB = true end
+                    end
+                    if (nameInDB == false) then 
+                        table.insert(mainDatabase.other, name) 
+                    end
+                end
+            end
+
+            -- for other button click, when emote isn't lick or tickle
+            if (emote ~= "lick" and emote ~= "tickle" and emote ~= nil) then 
+                emoteColor = "yellow"
                 -- check if the given emote is in the list of in-game emotes
                 for i, v in pairs(ZUI_LickAndTickle.emotes) do
                     for j, k in ipairs(v) do
@@ -392,7 +416,6 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
         end
     end
 end
-
 
 function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
     local unitname = UnitName(nameplateid)
@@ -653,4 +676,4 @@ end
 -- add lick and tickle button together - interface option
 
 -- final tests (check dbs)
--- final comments
+-- whole other db is disconnected
