@@ -674,3 +674,5 @@ end
 -- needs better locale support
 -- make keybind for emote - inteface option
 -- add lick and tickle button together - interface option
+-- add toggle enemy tracking - interface option
+-- add toggle friendly tracking - interface option
