@@ -6,7 +6,7 @@ L["Tickle"] = true
 L["Lick"] = true
 L["|cFFCFCFCFLeft click|r: Show/Hide UI"] = true
 L["|cFFCFCFCFRight click|r: Change Emote"] = true
-L["|cFFCFCFCF/lat-reset or /latre to reset|r"] = true
+L["|cFFCFCFCF/fet-reset or /fetre to reset|r"] = true
 L["Enter Other Emote"] = true
 L["|cfffc4e85Emote not found. Please try another emote|r"] = true
 
