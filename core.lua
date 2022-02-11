@@ -313,7 +313,6 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
                     if (v == name) then inTheOtherDB = true end
                 end
                 if (inTheOtherDB == false) then 
-                    print("hit")
                     table.insert(mainDatabase.other, name) 
                 end
             end
@@ -336,7 +335,6 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
                     if (v == name) then inTheOtherDB = true end
                 end
                 if (inTheOtherDB == false) then 
-                    print("hit")
                     table.insert(mainDatabase.other, name) 
                 end   
             end   
