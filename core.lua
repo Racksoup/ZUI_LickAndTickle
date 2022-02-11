@@ -676,4 +676,3 @@ end
 -- add lick and tickle button together - interface option
 
 -- final tests (check dbs)
--- whole other db is disconnected
