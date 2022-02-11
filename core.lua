@@ -639,8 +639,6 @@ end
 -- needs better locale support
 -- make keybind for emote - inteface option
 -- add lick and tickle button together - interface option
--- bug, lick can remove tickle (after 2.5s) --- sometimes. because of timeout UnregisterEvent
 
--- lick seems like it can destroy yellow frames when typed
 -- final tests (check dbs)
 -- final comments
