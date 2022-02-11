@@ -206,7 +206,10 @@ function ZUI_LickAndTickle:CreateEmoteButtons(frameName, parent, btnText, emote)
     emoteButton:SetFrameLevel(0)
     emoteButton:SetSize(64, 20)
     emoteButton:SetPoint("CENTER", points[1], points[2])
-    emoteButton:SetScript("OnClick", function() ZUI_LickAndTickle:AddTargetToDB(emote) end)
+    emoteButton:SetScript("OnClick", function() 
+        LAT_GUI.ButtonFrame:UnregisterEvent("CHAT_MSG_TEXT_EMOTE") 
+        ZUI_LickAndTickle:AddTargetToDB(emote) 
+    end)
     emoteButton:Show()
 
     -- add text to emote button
@@ -283,6 +286,7 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote)
             end
         end
     end
+    LAT_GUI.ButtonFrame:RegisterEvent("CHAT_MSG_TEXT_EMOTE") 
 end
 
 function ZUI_LickAndTickle:NamePlateAdded(nameplateid)
