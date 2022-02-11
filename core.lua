@@ -252,10 +252,10 @@ function ZUI_LickAndTickle:CreateEmoteButtons(frameName, parent, btnText, emote)
         ZUI_LickAndTickle:AddTargetToDB(emote, nil, "profile") 
         ZUI_LickAndTickle:AddTargetToDB(emote, nil, "realm") 
         
-        C_Timer.After(2.5, function() 
+
             LAT_GUI.ButtonFrame:RegisterEvent("CHAT_MSG_TEXT_EMOTE")  
             ZUI_LickAndTickle.emoteButtonPressed = false
-        end)
+
     end)
     emoteButton:Show()
 
@@ -296,7 +296,7 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
             -- for each emote look through their DB (there are 3 DB's, one for each emote) 
             -- and check if the target is already in the DB. if not add them to DB
             if (emote == "tickle") then 
-                
+                print(emote)
                 emoteColor = "yellow"
                 -- set first obj. first loop not working without any obj in table. put first target in
                 if (#mainDatabase.tickled == 0) then table.insert(mainDatabase.tickled, name) end
@@ -341,8 +341,9 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
                 end   
             end   
 
-            if (emote == nil or isChatMsgEmote) then 
+            if (emote == nil and isChatMsgEmote) then 
                 emoteColor = "yellow"
+                print("hit")
                 -- check if the given emote is in the list of in-game emotes
                 for i, v in pairs(ZUI_LickAndTickle.emotes) do
                     for j, k in ipairs(v) do
@@ -372,7 +373,7 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
                         table.remove(LAT_GUI.iconTable, i) 
                         icon:Hide()
                         -- if the icon was red we need to spawn a new icon (blue or red)
-                        if (icon.color == "red") then 
+                        if (icon.color == "red") then                
                             ZUI_LickAndTickle:NamePlateAdded(icon.nameplateid)
                         end
                     end
@@ -640,5 +641,6 @@ end
 -- add lick and tickle button together - interface option
 -- bug, lick can remove tickle (after 2.5s) --- sometimes. because of timeout UnregisterEvent
 
+-- lick seems like it can destroy yellow frames when typed
 -- final tests (check dbs)
 -- final comments
