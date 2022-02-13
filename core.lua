@@ -350,27 +350,19 @@ function ZUI_LickAndTickle:AddTargetToDB(emote, isChatMsgEmote, DB, LorT)
                 if (inTheOtherDB == false) then 
                     table.insert(mainDatabase.other, name) 
                 end   
-            end   
+            end  
 
             -- for chat messages
             if (emote == nil and isChatMsgEmote) then 
-                emoteColor = "yellow"
-                -- check if the given emote is in the list of in-game emotes
-                for i, v in pairs(ZUI_LickAndTickle.emotes) do
-                    for j, k in ipairs(v) do
-                        if (emote == k.emote) then emoteInEmotesList = true end
-                    end
-                end
-                if (emoteInEmotesList) then
+                emoteColor = "yellow" 
                 -- set first object
-                    if (#mainDatabase.other == 0) then table.insert(mainDatabase.other, name) end
-                    -- check if in Other DB, if not add to DB
-                    for i, v in ipairs(mainDatabase.other) do
-                        if (v == name) then nameInDB = true end
-                    end
-                    if (nameInDB == false) then 
-                        table.insert(mainDatabase.other, name) 
-                    end
+                if (#mainDatabase.other == 0) then table.insert(mainDatabase.other, name) end
+                -- check if in Other DB, if not add to DB
+                for i, v in ipairs(mainDatabase.other) do
+                    if (v == name) then nameInDB = true end
+                end
+                if (nameInDB == false) then 
+                    table.insert(mainDatabase.other, name) 
                 end
             end
 
@@ -481,7 +473,7 @@ function ZUI_LickAndTickle:CreateSingleIcon(bgFile, namePlate, nameplateid, unit
         bgFile = bgFile,
         tile = true,
         tileEdge = true,
-        tileSize = 20,
+        tileSize = 18,
         insets = { left = 0, right = 0, top = 0, bottom = 0 },
     }
 
