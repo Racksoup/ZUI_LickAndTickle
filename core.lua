@@ -252,7 +252,7 @@ function ZUI_LickAndTickle:CreateEmoteButtons(frameName, parent, btnText, emote)
     local emoteButton = CreateFrame("Button", frameName, parent)
     emoteButton.btnText = btnText
     emoteButton.emote = emote
-    emoteButton:SetFrameStrata("MEDIUM")
+    emoteButton:SetFrameStrata("HIGH")
     emoteButton:SetFrameLevel(0)
     emoteButton:SetSize(64, 20)
     emoteButton:SetPoint("CENTER", points[1], points[2])
