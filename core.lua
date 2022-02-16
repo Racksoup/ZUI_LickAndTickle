@@ -252,7 +252,7 @@ function ZUI_LickAndTickle:CreateEmoteButtons(frameName, parent, btnText, emote)
     local emoteButton = CreateFrame("Button", frameName, parent)
     emoteButton.btnText = btnText
     emoteButton.emote = emote
-    emoteButton:SetFrameStrata("HIGH")
+    emoteButton:SetFrameStrata("MEDIUM")
     emoteButton:SetFrameLevel(0)
     emoteButton:SetSize(64, 20)
     emoteButton:SetPoint("CENTER", points[1], points[2])
@@ -486,7 +486,7 @@ function ZUI_LickAndTickle:CreateSingleIcon(bgFile, namePlate, nameplateid, unit
     frame.nameplateid = nameplateid
     frame.bgFile = bgFile
     frame:SetBackdrop(backdropInfo)
-    frame:SetFrameStrata("HIGH")
+    frame:SetFrameStrata("MEDIUM")
     frame:SetFrameLevel(0)
     frame:SetSize(18, 18)
     if(bgFile == "Interface\\AddOns\\ZUI_LickAndTickle\\images\\RedBall.blp") then 
