@@ -1,0 +1,12 @@
+## Interface: 90200
+## Title: ZUI Friendly Emote Tracker
+## Author: ZUI
+## SavedVariables: ZUI_LickAndTickleDB
+## OptionalDeps: Ace3
+## X-Embeds: Ace3
+
+embeds.xml
+
+enUS.lua
+core.lua
+emoteList.lua
